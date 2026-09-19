@@ -41,6 +41,8 @@ struct WidgetCard: View {
             .foregroundStyle(.white)
             .background { CardBackdrop(photoID: photo?.id, fallback: photo?.averageColor) }
             .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+            // Taps land exactly on the visible card, never on photo overflow from a neighbour.
+            .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 32, style: .continuous)
                     .strokeBorder(.white.opacity(0.14), lineWidth: 0.75)
@@ -78,6 +80,7 @@ private struct CardBackdrop: View {
             }
             LinearGradient(colors: [.black.opacity(0.05), .black.opacity(0.42)], startPoint: .top, endPoint: .bottom)
         }
+        .allowsHitTesting(false)
         .task(id: photoID) {
             guard let photoID else { glow = nil; return }
             let image = await ImageCache.shared.glow(photoID)

@@ -223,6 +223,7 @@ struct WidgetMat: View {
                 .overlay { glow.resizable().scaledToFill() }
                 .overlay(Color.black.opacity(0.12))
                 .clipped()
+                .allowsHitTesting(false)
         } else {
             color
         }

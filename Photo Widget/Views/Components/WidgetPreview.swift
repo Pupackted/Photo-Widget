@@ -37,6 +37,7 @@ struct WidgetPreview: View {
         }
         .aspectRatio(size.canonicalSize.width / size.canonicalSize.height, contentMode: .fit)
         .clipShape(WidgetOutline(size: size))
+        .contentShape(WidgetOutline(size: size))
     }
 }
 
@@ -59,6 +60,8 @@ struct RenderedPhoto: View {
                 }
             }
             .clipped()
+            // Clipping only hides the overflow of a filled photo; it would still catch taps.
+            .contentShape(Rectangle())
             .task(id: "\(photo.id)\(size)\(generation)") {
                 var loaded = await ImageCache.shared.render(widget: widgetID, photo: photo.id, size: size, generation: generation)
                 if loaded == nil { loaded = await ImageCache.shared.thumbnail(photo.id) }
@@ -104,6 +107,7 @@ struct PhotoThumbnail: View {
                 }
             }
             .clipped()
+            .contentShape(Rectangle())
             .task(id: photo.id) {
                 if let cached = ImageCache.shared.cached("thumb/\(photo.id)") {
                     image = cached
@@ -142,6 +146,7 @@ struct AmbientBackground: View {
             (colorScheme == .dark ? Color.black.opacity(0.28) : Color.white.opacity(0.3))
         }
         .clipped()
+        .allowsHitTesting(false)
         .ignoresSafeArea()
         .task(id: photoID) {
             guard let photoID, let image = await ImageCache.shared.glow(photoID) else {

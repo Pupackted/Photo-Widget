@@ -279,6 +279,7 @@ private struct FilterSwatch: View {
                 }
                 .frame(width: 64, height: 64)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(3)
                 .overlay {
                     RoundedRectangle(cornerRadius: 17, style: .continuous)
@@ -351,6 +352,7 @@ struct FramePanel: View {
                     swatchFill(mat)
                         .frame(width: 34, height: 34)
                         .clipShape(Circle())
+                        .contentShape(Circle())
                         .overlay(Circle().strokeBorder(.primary.opacity(0.15), lineWidth: 0.5))
                         .padding(4)
                         .overlay(Circle().strokeBorder(.tint, lineWidth: selected ? 2.5 : 0))
