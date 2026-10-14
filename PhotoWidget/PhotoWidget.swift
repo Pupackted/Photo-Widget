@@ -90,7 +90,7 @@ private struct PhotoFace: View {
 
         tappable {
             WidgetFace(style: widget.style, size: size, appearance: appearance, isWidget: true,
-                       collage: widget.effectiveLayout) { index in
+                       collage: widget.style.layout.effective(photoCount: photos.count)) { index in
                 if photos.indices.contains(index) {
                     photoImage(photos[index])
                         .id(photos[index].id)
@@ -145,19 +145,31 @@ private struct EmptyFace: View {
     let widget: PhotoWidgetConfig?
     let size: WidgetSize
 
+    private var title: String {
+        guard let widget else { return String(localized: "Add Photos") }
+        return widget.source == .onThisDay ? String(localized: "No memories yet") : String(localized: "\(widget.name) is empty")
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: "photo.badge.plus")
                 .font(.system(size: size == .small ? 30 : 34, weight: .medium))
                 .foregroundStyle(.white.opacity(0.95))
-            Text(widget.map { String(localized: "\($0.name) is empty") } ?? String(localized: "Add Photos"))
+            Text(title)
                 .font(.system(.subheadline, design: .rounded, weight: .semibold))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
             if size != .small {
-                Text("Tap to choose photos in the app")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.75))
+                Group {
+                    if widget?.source == .onThisDay {
+                        Text("Photos taken on this day in past years show up here")
+                    } else {
+                        Text("Tap to choose photos in the app")
+                    }
+                }
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.75))
+                .multilineTextAlignment(.center)
             }
         }
         .padding()

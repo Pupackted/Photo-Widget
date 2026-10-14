@@ -61,6 +61,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7C9BE3012FD1F000005CC731 /* Exceptions for "Photo Widget" folder in "Photo Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7C9BE1C72FD1EA71005CC731 /* Photo Widget */;
+		};
 		7C9BE20D2FD1EC61005CC731 /* Exceptions for "PhotoWidget" folder in "PhotoWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -73,6 +80,9 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7C9BE1CA2FD1EA71005CC731 /* Photo Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7C9BE3012FD1F000005CC731 /* Exceptions for "Photo Widget" folder in "Photo Widget" target */,
+			);
 			path = "Photo Widget";
 			sourceTree = "<group>";
 		};
@@ -528,9 +538,11 @@
 				DEVELOPMENT_TEAM = 25C6TYUK25;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Photo Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Photo Widget";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo Widget reads your library to keep album widgets in sync and to find On This Day memories. Your photos never leave your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -564,9 +576,11 @@
 				DEVELOPMENT_TEAM = 25C6TYUK25;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Photo Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Photo Widget";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo Widget reads your library to keep album widgets in sync and to find On This Day memories. Your photos never leave your device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

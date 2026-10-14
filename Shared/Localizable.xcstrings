@@ -362,6 +362,46 @@
         }
       }
     },
+    "Album": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        }
+      }
+    },
+    "Albums and On This Day": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album dan Hari Ini Dulu"
+          }
+        }
+      }
+    },
+    "Albums with photos in them show up here.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album yang berisi foto akan muncul di sini."
+          }
+        }
+      }
+    },
+    "Allow Access to Photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Izinkan Akses ke Foto"
+          }
+        }
+      }
+    },
     "Auto": {
       "localizations": {
         "id": {
@@ -452,12 +492,32 @@
         }
       }
     },
+    "Choose Another Album": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Album Lain"
+          }
+        }
+      }
+    },
     "Choose Photos": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
             "value": "Pilih Foto"
+          }
+        }
+      }
+    },
+    "Choose an Album": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Album"
           }
         }
       }
@@ -932,6 +992,16 @@
         }
       }
     },
+    "If you sync a widget with an album or turn on On This Day, Photo Widget asks for access to your photo library. It reads the library only on your device, only to choose photos for those widgets. You can change this at any time in Settings → Privacy & Security → Photos.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika Anda menyinkronkan widget dengan album atau menyalakan Hari Ini Dulu, Photo Widget meminta akses ke perpustakaan foto Anda. Perpustakaan hanya dibaca di perangkat Anda, hanya untuk memilih foto bagi widget tersebut. Anda bisa mengubahnya kapan saja di Pengaturan → Privasi & Keamanan → Foto."
+          }
+        }
+      }
+    },
     "Importing %lld photos…": {
       "localizations": {
         "id": {
@@ -978,6 +1048,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Intensitas"
+          }
+        }
+      }
+    },
+    "Its %lld photos will be swapped for ones from your library, kept up to date automatically.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fotonya akan diganti dengan foto dari perpustakaan Anda, yang diperbarui secara otomatis."
           }
         }
       }
@@ -1122,12 +1202,32 @@
         }
       }
     },
+    "No Albums": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak Ada Album"
+          }
+        }
+      }
+    },
     "No accounts, no tracking": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
             "value": "Tanpa akun, tanpa pelacakan"
+          }
+        }
+      }
+    },
+    "No memories yet": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum ada kenangan"
           }
         }
       }
@@ -1192,7 +1292,17 @@
         }
       }
     },
-    "Only the photos you pick": {
+    "On This Day": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hari Ini Dulu"
+          }
+        }
+      }
+    },
+    "Only the photos you choose": {
       "localizations": {
         "id": {
           "stringUnit": {
@@ -1212,12 +1322,32 @@
         }
       }
     },
+    "Open Settings": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka Pengaturan"
+          }
+        }
+      }
+    },
     "Opens the editor": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
             "value": "Membuka editor"
+          }
+        }
+      }
+    },
+    "Order": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urutan"
           }
         }
       }
@@ -1272,12 +1402,22 @@
         }
       }
     },
-    "Photo Widget uses the system photo picker, so it never has access to the rest of your library. It only sees the photos you select.": {
+    "Photo Widget can only see the photos you’ve allowed. You can change this in Settings → Privacy & Security → Photos.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Photo Widget menggunakan pemilih foto bawaan sistem, jadi tidak pernah bisa mengakses isi perpustakaan foto Anda yang lain. App ini hanya melihat foto yang Anda pilih."
+            "value": "Photo Widget hanya bisa melihat foto yang Anda izinkan. Anda bisa mengubahnya di Pengaturan → Privasi & Keamanan → Foto."
+          }
+        }
+      }
+    },
+    "Photo Widget normally uses the system photo picker, so it only sees the photos you select.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo Widget biasanya menggunakan pemilih foto bawaan sistem, jadi hanya melihat foto yang Anda pilih."
           }
         }
       }
@@ -1298,6 +1438,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Foto dihapus"
+          }
+        }
+      }
+    },
+    "Photos You Choose": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Pilihan Anda"
+          }
+        }
+      }
+    },
+    "Photos from": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto dari"
+          }
+        }
+      }
+    },
+    "Photos taken on this day in past years show up here": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto yang diambil pada tanggal ini di tahun-tahun sebelumnya akan muncul di sini"
           }
         }
       }
@@ -1328,6 +1498,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pilih beberapa foto favorit dan kami akan membingkainya dengan indah untuk Layar Utama Anda."
+          }
+        }
+      }
+    },
+    "Pick up to 50 photos, sync an album, or relive this day in past years — one at a time or as a collage.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih hingga 50 foto, sinkronkan album, atau kenang hari ini di tahun-tahun lalu — satu per satu atau sebagai kolase."
           }
         }
       }
@@ -1418,6 +1598,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ganti Nama Widget"
+          }
+        }
+      }
+    },
+    "Replace Photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganti Foto"
+          }
+        }
+      }
+    },
+    "Replace this widget’s photos?": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganti foto widget ini?"
           }
         }
       }
@@ -1622,6 +1822,26 @@
         }
       }
     },
+    "Sync an Album": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sinkronkan Album"
+          }
+        }
+      }
+    },
+    "Sync now": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sinkronkan sekarang"
+          }
+        }
+      }
+    },
     "Tap Edit in the corner, then Add Widget.": {
       "localizations": {
         "id": {
@@ -1652,12 +1872,32 @@
         }
       }
     },
+    "Tap widget to": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ketuk widget untuk"
+          }
+        }
+      }
+    },
     "Text": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
             "value": "Teks"
+          }
+        }
+      }
+    },
+    "The widget shows the album’s newest %lld photos and updates as you add more.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget menampilkan %lld foto terbaru di album dan ikut diperbarui saat Anda menambah foto."
           }
         }
       }
@@ -1722,6 +1962,16 @@
         }
       }
     },
+    "To sync albums and find On This Day memories, Photo Widget needs access to your photo library. Your photos never leave your device.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk menyinkronkan album dan menemukan kenangan Hari Ini Dulu, Photo Widget perlu akses ke perpustakaan foto Anda. Foto Anda tidak pernah keluar dari perangkat."
+          }
+        }
+      }
+    },
     "Today": {
       "localizations": {
         "id": {
@@ -1778,16 +2028,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Urungkan"
-          }
-        }
-      }
-    },
-    "Up to 50 photos per widget, one at a time or as a collage, changing through the day — or with a tap.": {
-      "localizations": {
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hingga 50 foto per widget, satu per satu atau sebagai kolase, berganti sepanjang hari — atau dengan sekali ketuk."
           }
         }
       }

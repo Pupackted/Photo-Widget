@@ -110,7 +110,7 @@ private struct PanelButton: View {
 
 /// A compact glass button showing a setting and its value; tapping opens a menu of choices.
 private struct MenuPill<Value: Hashable>: View {
-    let title: String
+    let title: LocalizedStringKey
     let symbol: String
     let options: [Value]
     @Binding var selection: Value
@@ -122,34 +122,78 @@ private struct MenuPill<Value: Hashable>: View {
                 ForEach(options, id: \.self) { Text(label($0)).tag($0) }
             }
         } label: {
-            HStack(spacing: 10) {
-                Image(systemName: symbol)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.tint)
-                    .contentTransition(.symbolEffect(.replace))
-                    .frame(width: 22)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(title)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(label(selection))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .contentTransition(.interpolate)
-                }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity)
-            .glass(.interactive, in: .rect(cornerRadius: 18))
+            PillLabel(title: title, symbol: symbol, value: label(selection))
         }
         .buttonStyle(.plain)
         .animation(.snappySpring, value: selection)
         .haptic(.selection, trigger: selection)
+    }
+}
+
+/// Where the widget's photos come from: picked by hand, an album, or On This Day.
+private struct SourcePill: View {
+    let source: PhotoSource
+    let onChoose: (SourceChoice) -> Void
+
+    private var choice: SourceChoice {
+        switch source {
+        case .picked: .picked
+        case .album: .album
+        case .onThisDay: .onThisDay
+        }
+    }
+
+    var body: some View {
+        Menu {
+            Picker(selection: Binding(get: { choice }, set: onChoose)) {
+                Label("Photos You Choose", systemImage: PhotoSource.picked.symbol).tag(SourceChoice.picked)
+                Label("Sync an Album", systemImage: "rectangle.stack").tag(SourceChoice.album)
+                Label("On This Day", systemImage: "calendar.badge.clock").tag(SourceChoice.onThisDay)
+            } label: {
+                Text("Photos from")
+            }
+            if choice == .album {
+                Button("Choose Another Album", systemImage: "rectangle.stack.badge.plus") { onChoose(.album) }
+            }
+        } label: {
+            PillLabel(title: "Photos from", symbol: source.symbol, value: source.title)
+        }
+        .buttonStyle(.plain)
+        .animation(.snappySpring, value: source)
+    }
+}
+
+private struct PillLabel: View {
+    let title: LocalizedStringKey
+    let symbol: String
+    let value: String
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.tint)
+                .contentTransition(.symbolEffect(.replace))
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .contentTransition(.interpolate)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.up.chevron.down")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity)
+        .glass(.interactive, in: .rect(cornerRadius: 18))
     }
 }
 
@@ -559,12 +603,16 @@ struct CaptionPanel: View {
 
 struct TimingPanel: View {
     @Binding var widget: PhotoWidgetConfig
+    let onChooseSource: (SourceChoice) -> Void
 
     private var rotates: Bool { widget.photos.count > 1 }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 12) {
+                SourcePill(source: widget.source, onChoose: onChooseSource)
+                    .padding(.horizontal, 20)
+
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Change photo")

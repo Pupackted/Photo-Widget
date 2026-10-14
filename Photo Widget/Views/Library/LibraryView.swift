@@ -9,6 +9,7 @@ struct LibraryView: View {
 
     @State private var path: [UUID] = []
     @State private var showsPicker = false
+    @State private var sourceRequest: SourceChoice?
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var showsSettings = false
     @State private var showsGuide = false
@@ -48,7 +49,7 @@ struct LibraryView: View {
             .scrollIndicators(.hidden)
             .overlay {
                 if model.widgets.isEmpty {
-                    EmptyLibrary(onCreate: { showsPicker = true })
+                    EmptyLibrary(onChoose: choose)
                         .transition(.opacity.combined(with: .scale(scale: 0.96)))
                 }
             }
@@ -69,6 +70,7 @@ struct LibraryView: View {
             guard !items.isEmpty else { return }
             createWidget(from: items)
         }
+        .photoSourceFlow($sourceRequest) { source in createWidget(syncedWith: source) }
         .sheet(isPresented: $showsSettings) { SettingsView() }
         .sheet(isPresented: $showsGuide) { AddWidgetGuide() }
         .alert("Rename Widget", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
@@ -95,7 +97,11 @@ struct LibraryView: View {
             await model.refreshPlacedWidgets()
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.refreshPlacedWidgets() } }
+            guard phase == .active else { return }
+            Task {
+                await model.refreshPlacedWidgets()
+                await model.syncAll()
+            }
         }
         .onChange(of: model.placedWidgetIDs.isEmpty) { _, isEmpty in
             // Their widget made it to the Home Screen: a good moment to ask, once.
@@ -149,8 +155,10 @@ struct LibraryView: View {
     }
 
     private var newWidgetButton: some View {
-        Button {
-            showsPicker = true
+        Menu {
+            Button("Choose Photos", systemImage: "photo.on.rectangle.angled") { choose(.picked) }
+            Button("Sync an Album", systemImage: "rectangle.stack") { choose(.album) }
+            Button("On This Day", systemImage: "calendar.badge.clock") { choose(.onThisDay) }
         } label: {
             Label("New Widget", systemImage: "plus")
                 .font(.headline)
@@ -173,10 +181,22 @@ struct LibraryView: View {
         }
     }
 
+    private func choose(_ choice: SourceChoice) {
+        if choice == .picked { showsPicker = true } else { sourceRequest = choice }
+    }
+
     private func createWidget(from items: [PhotosPickerItem]) {
         let id = withAnimation(.snappySpring) { model.createWidget() }
         model.importPhotos(items, into: id)
         pickerItems = []
+        open(id)
+    }
+
+    private func createWidget(syncedWith source: PhotoSource) {
+        open(withAnimation(.snappySpring) { model.createSyncedWidget(source) })
+    }
+
+    private func open(_ id: UUID) {
         Task {
             // Let the new card land before zooming into it.
             try? await Task.sleep(for: .milliseconds(420))
@@ -226,7 +246,7 @@ private struct HomeScreenTip: View {
 }
 
 private struct EmptyLibrary: View {
-    let onCreate: () -> Void
+    let onChoose: (SourceChoice) -> Void
     @State private var appeared = false
 
     var body: some View {
@@ -246,18 +266,39 @@ private struct EmptyLibrary: View {
             }
             .padding(.horizontal, 36)
 
-            Button(action: onCreate) {
-                Label("Choose Photos", systemImage: "photo.on.rectangle.angled")
-                    .font(.headline)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+            VStack(spacing: 14) {
+                Button {
+                    onChoose(.picked)
+                } label: {
+                    Label("Choose Photos", systemImage: "photo.on.rectangle.angled")
+                        .font(.headline)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                }
+                .prominentButtonStyle()
+                .controlSize(.large)
+
+                HStack(spacing: 10) {
+                    secondary("Sync an Album", symbol: "rectangle.stack") { onChoose(.album) }
+                    secondary("On This Day", symbol: "calendar.badge.clock") { onChoose(.onThisDay) }
+                }
             }
-            .prominentButtonStyle()
-            .controlSize(.large)
             .entrance(appeared, index: 4)
         }
         .padding(.bottom, 40)
         .onAppear { appeared = true }
+    }
+
+    private func secondary(_ title: LocalizedStringKey, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: symbol)
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .glass(.interactive, in: .capsule)
+        }
+        .buttonStyle(.pressable(scale: 0.94))
+        .foregroundStyle(.primary)
     }
 }
 

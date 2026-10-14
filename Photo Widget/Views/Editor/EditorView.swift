@@ -17,6 +17,8 @@ struct EditorView: View {
     @State private var showsFull = false
     @State private var showsGuide = false
     @State private var confirmsDelete = false
+    @State private var sourceRequest: SourceChoice?
+    @State private var replacing: SourceChoice?
 
     var body: some View {
         if let widget = model.widget(widgetID) {
@@ -93,6 +95,16 @@ struct EditorView: View {
         } message: {
             Text("A widget can hold up to \(PhotoWidgetConfig.maxPhotos) photos. Remove a few, or make another widget.")
         }
+        .confirmationDialog("Replace this widget’s photos?",
+                            isPresented: Binding(get: { replacing != nil }, set: { if !$0 { replacing = nil } }),
+                            titleVisibility: .visible, presenting: replacing) { choice in
+            Button("Replace Photos", role: .destructive) { sourceRequest = choice }
+        } message: { _ in
+            Text("Its \(widget.photos.count) photos will be swapped for ones from your library, kept up to date automatically.")
+        }
+        .photoSourceFlow($sourceRequest) { source in
+            withAnimation(.snappySpring) { model.setSource(source, for: widgetID) }
+        }
         .confirmationDialog("Delete “\(widget.name)”?", isPresented: $confirmsDelete, titleVisibility: .visible) {
             Button("Delete Widget", role: .destructive) { delete() }
         } message: {
@@ -121,7 +133,7 @@ struct EditorView: View {
             onSelect: { id in
                 withAnimation(.snappySpring) { selectedPhotoID = id }
             },
-            onAddPhotos: addPhotos
+            onAddPhotos: { if widget.isSynced { syncNow() } else { addPhotos() } }
         )
         .overlay(alignment: .top) {
             SyncPill(progress: model.syncing[widgetID])
@@ -156,7 +168,9 @@ struct EditorView: View {
             photos: widget.photos,
             selection: $selectedPhotoID,
             importingCount: model.importing[widgetID] ?? 0,
+            isSynced: widget.isSynced,
             onAdd: addPhotos,
+            onSync: syncNow,
             onMove: { id, target in
                 withAnimation(.snappySpring) { model.movePhoto(id, to: target, in: widgetID) }
             },
@@ -207,7 +221,7 @@ struct EditorView: View {
             case .caption:
                 CaptionPanel(photo: photo, style: widget.style, photoCaption: photoCaption(photo))
             case .timing:
-                TimingPanel(widget: widget)
+                TimingPanel(widget: widget, onChooseSource: chooseSource)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -222,7 +236,9 @@ struct EditorView: View {
     private func toolbar(_ widget: PhotoWidgetConfig) -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
-                Button("Add Photos", systemImage: "photo.badge.plus", action: addPhotos)
+                if !widget.isSynced {
+                    Button("Add Photos", systemImage: "photo.badge.plus", action: addPhotos)
+                }
                 Button("Duplicate", systemImage: "plus.square.on.square") {
                     withAnimation(.snappySpring) { _ = model.duplicate(widgetID) }
                 }
@@ -236,6 +252,20 @@ struct EditorView: View {
     }
 
     // MARK: - Helpers
+
+    /// Hand-picked photos would be replaced by a synced source, so that asks first.
+    private func chooseSource(_ choice: SourceChoice) {
+        guard let widget = model.widget(widgetID) else { return }
+        if choice != .picked, !widget.isSynced, !widget.photos.isEmpty {
+            replacing = choice
+        } else {
+            sourceRequest = choice
+        }
+    }
+
+    private func syncNow() {
+        Task { await model.sync(widgetID, reportFailures: true) }
+    }
 
     private func addPhotos() {
         if model.capacity(of: widgetID) > 0 {

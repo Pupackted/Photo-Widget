@@ -2,12 +2,15 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// The widget's photos in order. The first one is the cover. Drag a photo to reorder; the
-/// selected photo carries a menu with everything else you can do to it.
+/// selected photo carries a menu with everything else you can do to it. A synced widget's photos
+/// follow the library, so they can only be reframed, and the add button becomes "sync now".
 struct Filmstrip: View {
     let photos: [WidgetPhoto]
     @Binding var selection: UUID?
     let importingCount: Int
+    var isSynced = false
     let onAdd: () -> Void
+    let onSync: () -> Void
     let onMove: (_ photo: UUID, _ target: UUID) -> Void
     let onMakeCover: (UUID) -> Void
     let onResetFraming: (UUID) -> Void
@@ -22,17 +25,8 @@ struct Filmstrip: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
-                        tile(photo, isCover: index == 0, isSelected: photo.id == selectedID)
+                        reorderable(tile(photo, isCover: index == 0, isSelected: photo.id == selectedID), photo: photo)
                             .id(photo.id)
-                            .onDrag {
-                                dragging = photo.id
-                                return NSItemProvider(object: photo.id.uuidString as NSString)
-                            } preview: {
-                                PhotoThumbnail(photo: photo)
-                                    .frame(width: 50, height: 64)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            }
-                            .onDrop(of: [.text], delegate: ReorderDropDelegate(target: photo.id, dragging: $dragging, onMove: onMove))
                             .transition(.scale(scale: 0.3).combined(with: .opacity))
                     }
                     ForEach(0..<importingCount, id: \.self) { _ in
@@ -40,7 +34,7 @@ struct Filmstrip: View {
                             .frame(width: 42, height: 52)
                             .transition(.scale(scale: 0.6).combined(with: .opacity))
                     }
-                    addTile
+                    if isSynced { syncTile } else { addTile }
                 }
                 .padding(.horizontal, 20)
                 .frame(height: 68)
@@ -54,6 +48,24 @@ struct Filmstrip: View {
         }
         .haptic(.selection, trigger: selection)
         .haptic(.impact(weight: .light), trigger: photos.map(\.id)) { old, new in Set(old) == Set(new) && old != new }
+    }
+
+    @ViewBuilder
+    private func reorderable(_ tile: some View, photo: WidgetPhoto) -> some View {
+        if isSynced {
+            tile
+        } else {
+            tile
+                .onDrag {
+                    dragging = photo.id
+                    return NSItemProvider(object: photo.id.uuidString as NSString)
+                } preview: {
+                    PhotoThumbnail(photo: photo)
+                        .frame(width: 50, height: 64)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .onDrop(of: [.text], delegate: ReorderDropDelegate(target: photo.id, dragging: $dragging, onMove: onMove))
+        }
     }
 
     private func tile(_ photo: WidgetPhoto, isCover: Bool, isSelected: Bool) -> some View {
@@ -117,12 +129,27 @@ struct Filmstrip: View {
 
     @ViewBuilder
     private func actions(for photo: WidgetPhoto, isCover: Bool) -> some View {
-        if !isCover {
+        if !isCover, !isSynced {
             Button("Make Cover", systemImage: "star") { onMakeCover(photo.id) }
         }
         Button("Reset Framing", systemImage: "arrow.counterclockwise") { onResetFraming(photo.id) }
-        Divider()
-        Button("Remove Photo", systemImage: "trash", role: .destructive) { onRemove(photo.id) }
+        if !isSynced {
+            Divider()
+            Button("Remove Photo", systemImage: "trash", role: .destructive) { onRemove(photo.id) }
+        }
+    }
+
+    private var syncTile: some View {
+        Button(action: onSync) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.system(size: 16, weight: .semibold))
+                .symbolEffect(.pulse, isActive: importingCount > 0)
+                .frame(width: 42, height: 52)
+                .glass(.interactive, in: .rect(cornerRadius: 10))
+        }
+        .buttonStyle(.pressable(scale: 0.88))
+        .disabled(importingCount > 0)
+        .accessibilityLabel("Sync now")
     }
 
     private var addTile: some View {

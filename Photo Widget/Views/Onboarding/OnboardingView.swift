@@ -5,7 +5,7 @@ struct OnboardingView: View {
     @State private var appeared = false
 
     private let features: [(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey)] = [
-        ("photo.stack", "Photos that rotate", "Up to 50 photos per widget, one at a time or as a collage, changing through the day — or with a tap."),
+        ("photo.stack", "Photos that rotate", "Pick up to 50 photos, sync an album, or relive this day in past years — one at a time or as a collage."),
         ("sparkles", "Smart framing", "Faces and subjects stay in frame at every widget size. Fine-tune with a pinch."),
         ("paintpalette", "Frames, filters & captions", "Give every widget the feel of a printed keepsake, or count the days to something special."),
     ]

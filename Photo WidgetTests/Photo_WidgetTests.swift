@@ -133,6 +133,16 @@ struct CaptionTests {
         #expect(WidgetAppearance.counterText(to: today, label: "", on: today, calendar: calendar) == "Today")
     }
 
+    @Test func timeAgoCountsWholeDays() throws {
+        var style = WidgetStyle()
+        style.caption = .timeAgo
+        var photo = WidgetPhoto(pixelWidth: 10, pixelHeight: 10)
+        let calendar = Calendar.current
+        let now = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 15, hour: 4)))
+        photo.dateTaken = try #require(calendar.date(from: DateComponents(year: 2019, month: 10, day: 15, hour: 9)))
+        #expect(WidgetAppearance.captionText(style: style, photo: photo, size: .small, date: now) == "7 years ago")
+    }
+
     @Test func perPhotoCaptionsComeFromThePhoto() {
         var style = WidgetStyle()
         style.caption = .perPhoto
@@ -266,5 +276,78 @@ struct ModelTests {
         #expect(abs(back.red - color.red) < 0.001)
         #expect(abs(back.green - color.green) < 0.001)
         #expect(abs(back.blue - color.blue) < 0.001)
+    }
+}
+
+struct LibrarySyncTests {
+    private let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Jakarta")!
+        return calendar
+    }()
+
+    private func photo(_ assetID: String?, day: String? = nil) -> WidgetPhoto {
+        var photo = WidgetPhoto(pixelWidth: 10, pixelHeight: 10)
+        photo.assetID = assetID
+        photo.showOnDay = day
+        return photo
+    }
+
+    @Test func pastYearsSkipDaysThatDontExist() throws {
+        let leapDay = try #require(calendar.date(from: DateComponents(year: 2028, month: 2, day: 29)))
+        let ranges = PhotoLibrarySync.pastYearRanges(sameDayAs: leapDay, earliestYear: 2015, calendar: calendar)
+        let years = ranges.map { calendar.component(.year, from: $0.start) }
+        #expect(years == [2024, 2020, 2016])
+        #expect(ranges.allSatisfy { $0.duration == 86_400 })
+        #expect(ranges.allSatisfy { calendar.component(.month, from: $0.start) == 2 && calendar.component(.day, from: $0.start) == 29 })
+    }
+
+    @Test func memoriesSpreadAcrossYears() {
+        let found = [("a1", 2024), ("a2", 2024), ("a3", 2024), ("b1", 2019), ("c1", 2015), ("c2", 2015)].map { (id: $0.0, year: $0.1) }
+        #expect(PhotoLibrarySync.pickAcrossYears(found, limit: 4) == ["a1", "b1", "c1", "a2"])
+        #expect(PhotoLibrarySync.pickAcrossYears(found, limit: 10).count == 6)
+        #expect(PhotoLibrarySync.pickAcrossYears([], limit: 3).isEmpty)
+    }
+
+    @Test func syncKeepsFramingAndFollowsThePlan() {
+        var kept = photo("keep")
+        kept.caption = "Bali"
+        kept.crops[WidgetSize.small.rawValue] = CropState(centerX: 0.3, centerY: 0.3, zoom: 2)
+        let dropped = photo("gone")
+        let new = photo("new")
+
+        let plan = [PhotoLibrarySync.Planned(assetID: "new", day: "10-16"), .init(assetID: "keep", day: "10-15"), .init(assetID: "missing", day: nil)]
+        let result = PhotoLibrarySync.assemble(plan, existing: [dropped, kept], imported: ["new": new])
+
+        #expect(result.map(\.assetID) == ["new", "keep"])
+        #expect(result[1].caption == "Bali")
+        #expect(result[1].hasCustomCrop(for: .small))
+        #expect(result.map(\.showOnDay) == ["10-16", "10-15"])
+    }
+
+    @Test func onThisDayShowsTodaysMemoriesOrFallsBack() throws {
+        var widget = PhotoWidgetConfig(name: "Memories")
+        widget.source = .onThisDay
+        widget.photos = [photo("a", day: "10-15"), photo("b", day: "10-16"), photo("c", day: "10-15")]
+        let october15 = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 15, hour: 9)))
+        let october20 = try #require(calendar.date(from: DateComponents(year: 2026, month: 10, day: 20, hour: 9)))
+
+        #expect(widget.poolIndices(on: october15, calendar: calendar) == [0, 2])
+        // A day with no memories shows the rest of the week's instead of nothing.
+        #expect(widget.poolIndices(on: october20, calendar: calendar) == [0, 1, 2])
+        #expect(widget.changesDaily)
+
+        widget.source = .picked
+        #expect(widget.poolIndices(on: october15, calendar: calendar) == [0, 1, 2])
+    }
+
+    @Test func sourceSurvivesSaving() throws {
+        for source in [PhotoSource.picked, .album(id: "ABC/L0/040", title: "Favorites"), .onThisDay] {
+            var widget = PhotoWidgetConfig(name: "Synced")
+            widget.source = source
+            widget.photos = [photo("asset", day: "01-02")]
+            let decoded = try JSONDecoder().decode(PhotoWidgetConfig.self, from: JSONEncoder().encode(widget))
+            #expect(decoded == widget)
+        }
     }
 }

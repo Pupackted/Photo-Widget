@@ -1,3 +1,4 @@
+import BackgroundTasks
 import Observation
 import PhotosUI
 import SwiftUI
@@ -49,6 +50,8 @@ final class AppModel {
     @ObservationIgnored private var renderTasks: [UUID: Task<Void, Never>] = [:]
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var undoTask: Task<Void, Never>?
+    @ObservationIgnored private var syncsInFlight: Set<UUID> = []
+    @ObservationIgnored private var lastSyncAll: Date?
     /// False when the saved library couldn't be read: its photos are then left untouched on disk.
     @ObservationIgnored private let libraryReadable: Bool
 
@@ -64,6 +67,7 @@ final class AppModel {
         // Clears out photos left behind if the app was closed in the middle of an import.
         collectUnusedPhotos()
         for widget in widgets { scheduleRender(widget.id, delay: .zero) }
+        Task { await syncAll() }
     }
 
     // MARK: - Reading
@@ -246,6 +250,118 @@ final class AppModel {
         try? FileManager.default.removeItem(at: legacy)
         scheduleSave()
         scheduleRender(widget.id, delay: .zero)
+    }
+
+    // MARK: - Photo library sync
+
+    /// A new widget that fills itself from an album or with On This Day memories.
+    @discardableResult
+    func createSyncedWidget(_ source: PhotoSource) -> UUID {
+        var widget = PhotoWidgetConfig(name: source.title)
+        widget.source = source
+        // "3 years ago" is what makes a memory a memory.
+        if source == .onThisDay { widget.style.caption = .timeAgo }
+        widgets.append(widget)
+        scheduleSave()
+        Task { await sync(widget.id, reportFailures: true) }
+        return widget.id
+    }
+
+    /// Points a widget at an album or On This Day, or hands its photos back to the user.
+    func setSource(_ source: PhotoSource, for id: UUID) {
+        guard widget(id)?.source != source else { return }
+        update(id) { widget in
+            // A name that was only ever the old source's ("On This Day") follows the new one.
+            if widget.isSynced, widget.name == widget.source.title, source != .picked { widget.name = source.title }
+            widget.source = source
+            guard source != .picked else { return }
+            // Hand-picked photos make way for the library's.
+            widget.photos.removeAll { $0.assetID == nil }
+            if source == .onThisDay, widget.style.caption == .none { widget.style.caption = .timeAgo }
+        }
+        WidgetStorage.resetOffset(for: id)
+        collectUnusedPhotos()
+        Task { await sync(id, reportFailures: true) }
+    }
+
+    /// Brings every synced widget up to date. Cheap when nothing changed, so it runs whenever the
+    /// app comes to the foreground.
+    func syncAll(force: Bool = false) async {
+        guard PhotoLibrarySync.hasAccess else { return }
+        if !force, let last = lastSyncAll, Date.now.timeIntervalSince(last) < 60 { return }
+        lastSyncAll = .now
+        for widget in widgets where widget.isSynced {
+            await sync(widget.id, reportFailures: false)
+        }
+    }
+
+    func sync(_ id: UUID, reportFailures: Bool) async {
+        guard let widget = widget(id), widget.isSynced, !syncsInFlight.contains(id) else { return }
+        syncsInFlight.insert(id)
+        defer { syncsInFlight.remove(id) }
+
+        let source = widget.source
+        guard let plan = await Task.detached(priority: .utility, operation: { PhotoLibrarySync.plan(for: source) }).value else { return }
+        let known = Set(widget.photos.compactMap(\.assetID))
+        let needed = plan.filter { !known.contains($0.assetID) }
+
+        var imported: [String: WidgetPhoto] = [:]
+        var failed = 0
+        if !needed.isEmpty {
+            importing[id, default: 0] += needed.count
+            // A few at a time, like hand-picked imports.
+            for batch in stride(from: 0, to: needed.count, by: 3).map({ Array(needed[$0..<min($0 + 3, needed.count)]) }) {
+                let results = await withTaskGroup(of: (String, WidgetPhoto?).self) { group in
+                    for item in batch {
+                        group.addTask {
+                            guard let data = await PhotoLibrarySync.imageData(for: item.assetID),
+                                  var photo = try? ImagePipeline.importPhoto(data: data) else { return (item.assetID, nil) }
+                            photo.assetID = item.assetID
+                            if photo.dateTaken == nil { photo.dateTaken = item.created }
+                            return (item.assetID, photo)
+                        }
+                    }
+                    var results: [(String, WidgetPhoto?)] = []
+                    for await result in group { results.append(result) }
+                    return results
+                }
+                for (assetID, photo) in results {
+                    if let photo { imported[assetID] = photo } else { failed += 1 }
+                }
+                importing[id] = max((importing[id] ?? 0) - batch.count, 0)
+            }
+            if importing[id] == 0 { importing[id] = nil }
+        }
+
+        // The widget was deleted, or pointed somewhere else, while this ran.
+        guard self.widget(id)?.source == source else {
+            removeFiles(of: imported.values.map(\.id))
+            return
+        }
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) {
+            update(id) { $0.photos = PhotoLibrarySync.assemble(plan, existing: $0.photos, imported: imported) }
+        }
+        collectUnusedPhotos()
+        if reportFailures, failed > 0 { importIssue = ImportIssue(failed: failed, total: needed.count) }
+    }
+
+    /// Asks iOS to wake the app shortly after midnight to refresh synced widgets.
+    func scheduleBackgroundSync() {
+        guard widgets.contains(where: \.isSynced) else {
+            BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: PhotoLibrarySync.refreshTaskID)
+            return
+        }
+        let calendar = Calendar.current
+        let request = BGAppRefreshTaskRequest(identifier: PhotoLibrarySync.refreshTaskID)
+        request.earliestBeginDate = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: .now))?
+            .addingTimeInterval(30 * 60)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
+    /// Waits for queued renders, so a background refresh doesn't end before the widget images exist.
+    func finishPendingWork() async {
+        for task in renderTasks.values { await task.value }
+        save()
     }
 
     // MARK: - Routing

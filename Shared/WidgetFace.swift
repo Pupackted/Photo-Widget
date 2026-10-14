@@ -136,11 +136,13 @@ struct WidgetAppearance {
             return text.isEmpty ? nil : text
         case .timeAgo:
             guard let taken = photo?.dateTaken else { return nil }
-            if Calendar.current.isDate(taken, inSameDayAs: date) { return String(localized: "Today") }
+            let calendar = Calendar.current
+            if calendar.isDate(taken, inSameDayAs: date) { return String(localized: "Today") }
             let formatter = RelativeDateTimeFormatter()
             formatter.dateTimeStyle = .named
             formatter.unitsStyle = .full
-            let text = formatter.localizedString(for: taken, relativeTo: date)
+            // Whole days, so a photo from this date in 2019 reads "7 years ago" all day, not "6 years ago" until the hour it was taken.
+            let text = formatter.localizedString(for: calendar.startOfDay(for: taken), relativeTo: calendar.startOfDay(for: date))
             return text.prefix(1).uppercased() + text.dropFirst()
         case .counter:
             return counterText(to: style.countDate, label: style.countLabel, on: date)

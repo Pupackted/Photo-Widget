@@ -8,13 +8,15 @@ nonisolated enum PhotoSchedule {
         indices(for: config, at: date, offset: offset).first ?? 0
     }
 
-    /// The photos on screen at `date`, one per collage cell, never repeating a photo.
-    /// Each rotation (or tap) moves on by a whole page, so a collage shows fresh photos every time.
+    /// The photos on screen at `date` (indices into `config.photos`), one per collage cell, never
+    /// repeating a photo. Each rotation (or tap) moves on by a whole page, so a collage shows fresh
+    /// photos every time.
     static func indices(for config: PhotoWidgetConfig, at date: Date, offset: Int = 0) -> [Int] {
-        let count = config.photos.count
-        guard count > 1 else { return count == 1 ? [0] : [] }
+        let pool = config.poolIndices(on: date)
+        let count = pool.count
+        guard count > 1 else { return pool }
 
-        let cells = config.effectiveLayout.cellCount
+        let cells = config.style.layout.effective(photoCount: count).cellCount
         // A widget that never rotates stays on its cover until tapped.
         let page = (config.rotation == .never ? 0 : slot(at: date, interval: config.rotation)) + offset
 
@@ -22,15 +24,14 @@ nonisolated enum PhotoSchedule {
         var step = page * cells
         // Two consecutive shuffle cycles always contain every photo, so this finds `cells` distinct ones.
         while result.count < cells, step < page * cells + 2 * count {
-            let index = position(step, config: config)
+            let index = position(step, count: count, config: config)
             if !result.contains(index) { result.append(index) }
             step += 1
         }
-        return result
+        return result.map { pool[$0] }
     }
 
-    private static func position(_ step: Int, config: PhotoWidgetConfig) -> Int {
-        let count = config.photos.count
+    private static func position(_ step: Int, count: Int, config: PhotoWidgetConfig) -> Int {
         // A widget that never rotates walks through from its cover; with two photos the only
         // order that never repeats a photo is plain alternation.
         guard config.order == .shuffle, config.rotation != .never, count > 2 else { return mod(step, count) }
@@ -51,10 +52,10 @@ nonisolated enum PhotoSchedule {
     }
 
     /// Every moment the widget looks different: each photo change, plus each midnight while the
-    /// caption counts days ("Yesterday", "12 days to go").
+    /// caption counts days ("Yesterday", "12 days to go") or On This Day moves on to new memories.
     static func timelineDates(for config: PhotoWidgetConfig, from date: Date, calendar: Calendar = .current) -> [Date] {
         var dates = config.photos.count > 1 ? entryDates(from: date, interval: config.rotation, calendar: calendar) : [date]
-        guard config.style.captionChangesDaily else { return dates }
+        guard config.changesDaily else { return dates }
 
         // Follow the photo changes, or a week ahead when the photo never changes on its own.
         let horizon = dates.count > 1 ? dates[dates.count - 1] : date.addingTimeInterval(7 * 86_400)

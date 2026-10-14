@@ -26,7 +26,7 @@ struct WidgetPreview: View {
                 WidgetFace(style: widget.style, size: size,
                            appearance: WidgetAppearance(style: widget.style, photo: lead, size: size),
                            glow: glow.map(Image.init(uiImage:)),
-                           collage: widget.effectiveLayout) { index in
+                           collage: widget.style.layout.effective(photoCount: photos.count)) { index in
                     if photos.indices.contains(index) {
                         RenderedPhoto(widgetID: widget.id, photo: photos[index], size: size,
                                       generation: model.renderGeneration[widget.id] ?? 0)

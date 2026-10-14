@@ -20,7 +20,15 @@ struct Photo_WidgetApp: App {
                 .onOpenURL { model.handle($0) }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background { model.save() }
+            if phase == .background {
+                model.save()
+                model.scheduleBackgroundSync()
+            }
+        }
+        .backgroundTask(.appRefresh(PhotoLibrarySync.refreshTaskID)) {
+            await model.syncAll(force: true)
+            await model.finishPendingWork()
+            await model.scheduleBackgroundSync()
         }
     }
 }

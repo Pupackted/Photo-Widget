@@ -11,6 +11,8 @@ nonisolated struct PhotoWidgetConfig: Codable, Identifiable, Hashable, Sendable 
     var id = UUID()
     var name: String
     var photos: [WidgetPhoto] = []
+    /// Where the photos come from. Synced widgets refill themselves from the photo library.
+    var source: PhotoSource = .picked
     var style = WidgetStyle()
     var rotation: RotationInterval = .hourly
     var order: PlaybackOrder = .inOrder
@@ -24,6 +26,21 @@ nonisolated struct PhotoWidgetConfig: Codable, Identifiable, Hashable, Sendable 
     var effectiveLayout: CollageLayout { style.layout.effective(photoCount: photos.count) }
 
     var remainingCapacity: Int { max(Self.maxPhotos - photos.count, 0) }
+
+    /// Synced widgets manage their own photos, so they can't be added, removed or reordered by hand.
+    var isSynced: Bool { source != .picked }
+
+    /// Whether the widget looks different from one day to the next.
+    var changesDaily: Bool { style.captionChangesDaily || source == .onThisDay }
+
+    /// The photos eligible on `date`: an On This Day widget shows that day's memories, or the
+    /// rest of the week's when that day has none; every other widget shows all of its photos.
+    func poolIndices(on date: Date, calendar: Calendar = .current) -> [Int] {
+        guard source == .onThisDay else { return Array(photos.indices) }
+        let key = PhotoSource.dayKey(for: date, calendar: calendar)
+        let today = photos.indices.filter { photos[$0].showOnDay == key }
+        return today.isEmpty ? Array(photos.indices) : today
+    }
 
     func photo(id: UUID?) -> WidgetPhoto? {
         guard let id else { return nil }
@@ -61,6 +78,10 @@ nonisolated struct WidgetPhoto: Codable, Identifiable, Hashable, Sendable {
     var averageColor = RGBColor(red: 0.55, green: 0.55, blue: 0.58)
     /// Shown when the widget's caption is set to "Per Photo".
     var caption = ""
+    /// The photo library asset this was imported from, for synced widgets.
+    var assetID: String?
+    /// For On This Day: the day ("MM-dd") this memory belongs to.
+    var showOnDay: String?
 
     var aspect: Double { Double(pixelWidth) / Double(max(pixelHeight, 1)) }
 
@@ -346,6 +367,39 @@ nonisolated enum CaptionFont: String, Codable, CaseIterable, Identifiable, Senda
     }
 }
 
+// MARK: - Source
+
+nonisolated enum PhotoSource: Codable, Hashable, Sendable {
+    /// Photos the user chose with the photo picker.
+    case picked
+    /// Kept in step with an album in the user's photo library.
+    case album(id: String, title: String)
+    /// Photos taken on this day in past years, refreshed every day.
+    case onThisDay
+
+    var title: String {
+        switch self {
+        case .picked: String(localized: "Photos You Choose")
+        case .album(_, let title): title
+        case .onThisDay: String(localized: "On This Day")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .picked: "hand.tap"
+        case .album: "rectangle.stack"
+        case .onThisDay: "calendar.badge.clock"
+        }
+    }
+
+    /// "10-15" for October 15th, in the user's calendar.
+    static func dayKey(for date: Date, calendar: Calendar = .current) -> String {
+        let parts = calendar.dateComponents([.month, .day], from: date)
+        return String(format: "%02d-%02d", parts.month ?? 0, parts.day ?? 0)
+    }
+}
+
 // MARK: - Behaviour
 
 nonisolated enum RotationInterval: String, Codable, CaseIterable, Identifiable, Sendable {
@@ -416,6 +470,7 @@ extension PhotoWidgetConfig {
         id = try c.decode(UUID.self, forKey: .id)
         name = c.value(.name, default: fallback.name)
         photos = (try? c.decodeIfPresent([Lenient<WidgetPhoto>].self, forKey: .photos))?.compactMap(\.value) ?? []
+        source = c.value(.source, default: fallback.source)
         style = c.value(.style, default: fallback.style)
         rotation = c.value(.rotation, default: fallback.rotation)
         order = c.value(.order, default: fallback.order)
@@ -437,6 +492,8 @@ extension WidgetPhoto {
         dateTaken = try? c.decodeIfPresent(Date.self, forKey: .dateTaken)
         averageColor = c.value(.averageColor, default: fallback.averageColor)
         caption = c.value(.caption, default: fallback.caption)
+        assetID = try? c.decodeIfPresent(String.self, forKey: .assetID)
+        showOnDay = try? c.decodeIfPresent(String.self, forKey: .showOnDay)
     }
 }
 
