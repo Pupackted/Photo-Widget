@@ -5,6 +5,9 @@ import CoreGraphics
 
 /// One widget the user has designed: a set of photos plus how they're framed, styled and rotated.
 nonisolated struct PhotoWidgetConfig: Codable, Identifiable, Hashable, Sendable {
+    /// Keeps each widget's storage and rendering time reasonable.
+    static let maxPhotos = 50
+
     var id = UUID()
     var name: String
     var photos: [WidgetPhoto] = []
@@ -17,6 +20,11 @@ nonisolated struct PhotoWidgetConfig: Codable, Identifiable, Hashable, Sendable 
 
     var coverPhoto: WidgetPhoto? { photos.first }
 
+    /// The layout actually used, which falls back to fewer cells when there aren't enough photos.
+    var effectiveLayout: CollageLayout { style.layout.effective(photoCount: photos.count) }
+
+    var remainingCapacity: Int { max(Self.maxPhotos - photos.count, 0) }
+
     func photo(id: UUID?) -> WidgetPhoto? {
         guard let id else { return nil }
         return photos.first { $0.id == id }
@@ -24,12 +32,16 @@ nonisolated struct PhotoWidgetConfig: Codable, Identifiable, Hashable, Sendable 
 
     /// The photo the widget is showing at `date`, honouring rotation, order and tap-to-advance.
     func currentPhoto(at date: Date = .now, offset: Int = 0) -> WidgetPhoto? {
-        guard !photos.isEmpty else { return nil }
-        return photos[PhotoSchedule.index(for: self, at: date, offset: offset)]
+        currentPhotos(at: date, offset: offset).first
+    }
+
+    /// Every photo on screen at `date`, one per collage cell.
+    func currentPhotos(at date: Date = .now, offset: Int = 0) -> [WidgetPhoto] {
+        PhotoSchedule.indices(for: self, at: date, offset: offset).map { photos[$0] }
     }
 
     var summary: String {
-        let count = photos.count == 1 ? "1 photo" : "\(photos.count) photos"
+        let count = photos.count == 1 ? String(localized: "1 photo") : String(localized: "\(photos.count) photos")
         guard photos.count > 1 else { return count }
         return "\(count) · \(rotation.summary)"
     }
@@ -47,6 +59,8 @@ nonisolated struct WidgetPhoto: Codable, Identifiable, Hashable, Sendable {
     var crops: [String: CropState] = [:]
     var dateTaken: Date?
     var averageColor = RGBColor(red: 0.55, green: 0.55, blue: 0.58)
+    /// Shown when the widget's caption is set to "Per Photo".
+    var caption = ""
 
     var aspect: Double { Double(pixelWidth) / Double(max(pixelHeight, 1)) }
 
@@ -156,10 +170,10 @@ nonisolated enum WidgetSize: String, Codable, CaseIterable, Identifiable, Sendab
 
     var title: String {
         switch self {
-        case .small: "Small"
-        case .medium: "Medium"
-        case .large: "Large"
-        case .extraLarge: "Extra Large"
+        case .small: String(localized: "Small")
+        case .medium: String(localized: "Medium")
+        case .large: String(localized: "Large")
+        case .extraLarge: String(localized: "Extra Large")
         }
     }
 
@@ -193,10 +207,18 @@ nonisolated struct WidgetStyle: Codable, Hashable, Sendable {
     var filterIntensity: Double = 1
     var frame: FrameStyle = .fullBleed
     var mat: MatStyle = .auto
+    var layout: CollageLayout = .single
     var caption: CaptionMode = .none
     var captionText: String = ""
     var font: CaptionFont = .rounded
     var fullColorInTintedMode = true
+    /// The day a "Days" caption counts from (in the past) or down to (in the future).
+    var countDate = Calendar.current.startOfDay(for: .now)
+    /// Words after the number, e.g. "together" → "1,204 days together".
+    var countLabel = ""
+
+    /// Whether the caption's text changes from one day to the next.
+    var captionChangesDaily: Bool { caption == .timeAgo || caption == .counter }
 }
 
 nonisolated enum PhotoFilter: String, Codable, CaseIterable, Identifiable, Sendable {
@@ -206,16 +228,16 @@ nonisolated enum PhotoFilter: String, Codable, CaseIterable, Identifiable, Senda
 
     var title: String {
         switch self {
-        case .original: "Original"
-        case .vivid: "Vivid"
-        case .golden: "Golden"
-        case .coastal: "Coastal"
-        case .film: "Film"
-        case .faded: "Faded"
-        case .instant: "Instant"
-        case .dream: "Dream"
-        case .mono: "Mono"
-        case .noir: "Noir"
+        case .original: String(localized: "Original")
+        case .vivid: String(localized: "Vivid")
+        case .golden: String(localized: "Golden")
+        case .coastal: String(localized: "Coastal")
+        case .film: String(localized: "Film")
+        case .faded: String(localized: "Faded")
+        case .instant: String(localized: "filter.instant", defaultValue: "Instant")
+        case .dream: String(localized: "Dream")
+        case .mono: String(localized: "filter.mono", defaultValue: "Mono")
+        case .noir: String(localized: "Noir")
         }
     }
 }
@@ -227,9 +249,9 @@ nonisolated enum FrameStyle: String, Codable, CaseIterable, Identifiable, Sendab
 
     var title: String {
         switch self {
-        case .fullBleed: "Full Bleed"
-        case .border: "Border"
-        case .polaroid: "Instant"
+        case .fullBleed: String(localized: "Full Bleed")
+        case .border: String(localized: "Border")
+        case .polaroid: String(localized: "frame.instant", defaultValue: "Instant")
         }
     }
 }
@@ -241,27 +263,69 @@ nonisolated enum MatStyle: String, Codable, CaseIterable, Identifiable, Sendable
 
     var title: String {
         switch self {
-        case .auto: "Auto"
-        case .glow: "Glow"
-        case .white: "White"
-        case .paper: "Paper"
-        case .charcoal: "Charcoal"
-        case .black: "Black"
+        case .auto: String(localized: "Auto")
+        case .glow: String(localized: "Glow")
+        case .white: String(localized: "White")
+        case .paper: String(localized: "Paper")
+        case .charcoal: String(localized: "Charcoal")
+        case .black: String(localized: "Black")
         }
     }
 }
 
-nonisolated enum CaptionMode: String, Codable, CaseIterable, Identifiable, Sendable {
-    case none, text, date, timeAgo
+/// How many photos a widget shows at once.
+nonisolated enum CollageLayout: String, Codable, CaseIterable, Identifiable, Sendable {
+    case single, duo, quad
 
     var id: String { rawValue }
 
     var title: String {
         switch self {
-        case .none: "None"
-        case .text: "Text"
-        case .date: "Date"
-        case .timeAgo: "Time Ago"
+        case .single: String(localized: "Single")
+        case .duo: String(localized: "Duo")
+        case .quad: String(localized: "Grid")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .single: "square"
+        case .duo: "square.split.2x1"
+        case .quad: "square.grid.2x2"
+        }
+    }
+
+    var cellCount: Int {
+        switch self {
+        case .single: 1
+        case .duo: 2
+        case .quad: 4
+        }
+    }
+
+    /// A collage never shows the same photo twice, so it shrinks to fit the photos there are.
+    func effective(photoCount: Int) -> CollageLayout {
+        switch self {
+        case .quad where photoCount >= 4: .quad
+        case .quad, .duo: photoCount >= 2 ? .duo : .single
+        case .single: .single
+        }
+    }
+}
+
+nonisolated enum CaptionMode: String, Codable, CaseIterable, Identifiable, Sendable {
+    case none, text, perPhoto, date, timeAgo, counter
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .none: String(localized: "None")
+        case .text: String(localized: "Text")
+        case .perPhoto: String(localized: "Per Photo")
+        case .date: String(localized: "Date")
+        case .timeAgo: String(localized: "Time Ago")
+        case .counter: String(localized: "Day Counter")
         }
     }
 }
@@ -273,11 +337,11 @@ nonisolated enum CaptionFont: String, Codable, CaseIterable, Identifiable, Senda
 
     var title: String {
         switch self {
-        case .system: "Classic"
-        case .rounded: "Rounded"
-        case .serif: "Serif"
-        case .mono: "Mono"
-        case .script: "Script"
+        case .system: String(localized: "Classic")
+        case .rounded: String(localized: "Rounded")
+        case .serif: String(localized: "Serif")
+        case .mono: String(localized: "font.mono", defaultValue: "Mono")
+        case .script: String(localized: "Script")
         }
     }
 }
@@ -303,25 +367,25 @@ nonisolated enum RotationInterval: String, Codable, CaseIterable, Identifiable, 
 
     var title: String {
         switch self {
-        case .never: "Never"
-        case .fifteenMinutes: "15 min"
-        case .thirtyMinutes: "30 min"
-        case .hourly: "Hourly"
-        case .threeHours: "3 hours"
-        case .sixHours: "6 hours"
-        case .daily: "Daily"
+        case .never: String(localized: "Never")
+        case .fifteenMinutes: String(localized: "15 min")
+        case .thirtyMinutes: String(localized: "30 min")
+        case .hourly: String(localized: "Hourly")
+        case .threeHours: String(localized: "3 hours")
+        case .sixHours: String(localized: "6 hours")
+        case .daily: String(localized: "Daily")
         }
     }
 
     var summary: String {
         switch self {
-        case .never: "Stays on cover"
-        case .fifteenMinutes: "Every 15 min"
-        case .thirtyMinutes: "Every 30 min"
-        case .hourly: "Hourly"
-        case .threeHours: "Every 3 hours"
-        case .sixHours: "Every 6 hours"
-        case .daily: "Daily"
+        case .never: String(localized: "Stays on cover")
+        case .fifteenMinutes: String(localized: "Every 15 min")
+        case .thirtyMinutes: String(localized: "Every 30 min")
+        case .hourly: String(localized: "Hourly")
+        case .threeHours: String(localized: "Every 3 hours")
+        case .sixHours: String(localized: "Every 6 hours")
+        case .daily: String(localized: "Daily")
         }
     }
 }
@@ -330,12 +394,81 @@ nonisolated enum PlaybackOrder: String, Codable, CaseIterable, Identifiable, Sen
     case inOrder, shuffle
 
     var id: String { rawValue }
-    var title: String { self == .inOrder ? "In Order" : "Shuffle" }
+    var title: String { self == .inOrder ? String(localized: "In Order") : String(localized: "Shuffle") }
 }
 
 nonisolated enum TapAction: String, Codable, CaseIterable, Identifiable, Sendable {
     case openApp, nextPhoto
 
     var id: String { rawValue }
-    var title: String { self == .openApp ? "Open App" : "Next Photo" }
+    var title: String { self == .openApp ? String(localized: "Open App") : String(localized: "Next Photo") }
+}
+
+// MARK: - Decoding
+
+// Every field falls back to its default when it's missing or unreadable, so a library saved by
+// an older (or newer) version of the app always loads instead of being thrown away.
+
+extension PhotoWidgetConfig {
+    nonisolated init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let fallback = PhotoWidgetConfig(name: "")
+        id = try c.decode(UUID.self, forKey: .id)
+        name = c.value(.name, default: fallback.name)
+        photos = (try? c.decodeIfPresent([Lenient<WidgetPhoto>].self, forKey: .photos))?.compactMap(\.value) ?? []
+        style = c.value(.style, default: fallback.style)
+        rotation = c.value(.rotation, default: fallback.rotation)
+        order = c.value(.order, default: fallback.order)
+        tapAction = c.value(.tapAction, default: fallback.tapAction)
+        createdAt = c.value(.createdAt, default: fallback.createdAt)
+        modifiedAt = c.value(.modifiedAt, default: fallback.modifiedAt)
+    }
+}
+
+extension WidgetPhoto {
+    nonisolated init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let fallback = WidgetPhoto(pixelWidth: 1, pixelHeight: 1)
+        id = try c.decode(UUID.self, forKey: .id)
+        pixelWidth = try c.decode(Int.self, forKey: .pixelWidth)
+        pixelHeight = try c.decode(Int.self, forKey: .pixelHeight)
+        focus = c.value(.focus, default: fallback.focus)
+        crops = c.value(.crops, default: fallback.crops)
+        dateTaken = try? c.decodeIfPresent(Date.self, forKey: .dateTaken)
+        averageColor = c.value(.averageColor, default: fallback.averageColor)
+        caption = c.value(.caption, default: fallback.caption)
+    }
+}
+
+extension WidgetStyle {
+    nonisolated init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let fallback = WidgetStyle()
+        filter = c.value(.filter, default: fallback.filter)
+        filterIntensity = c.value(.filterIntensity, default: fallback.filterIntensity)
+        frame = c.value(.frame, default: fallback.frame)
+        mat = c.value(.mat, default: fallback.mat)
+        layout = c.value(.layout, default: fallback.layout)
+        caption = c.value(.caption, default: fallback.caption)
+        captionText = c.value(.captionText, default: fallback.captionText)
+        font = c.value(.font, default: fallback.font)
+        fullColorInTintedMode = c.value(.fullColorInTintedMode, default: fallback.fullColorInTintedMode)
+        countDate = c.value(.countDate, default: fallback.countDate)
+        countLabel = c.value(.countLabel, default: fallback.countLabel)
+    }
+}
+
+/// Decodes an element if it can, so one damaged photo doesn't take the rest of the widget with it.
+private nonisolated struct Lenient<Value: Decodable>: Decodable {
+    let value: Value?
+
+    init(from decoder: any Decoder) throws {
+        value = try? Value(from: decoder)
+    }
+}
+
+extension KeyedDecodingContainer {
+    nonisolated func value<T: Decodable>(_ key: Key, default fallback: T) -> T {
+        (try? decodeIfPresent(T.self, forKey: key)) ?? fallback
+    }
 }

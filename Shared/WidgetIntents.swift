@@ -23,7 +23,7 @@ nonisolated struct PhotoWidgetEntity: AppEntity, Identifiable {
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
             title: "\(name)",
-            subtitle: photoCount == 1 ? "1 photo" : "\(photoCount) photos",
+            subtitle: photoCount == 1 ? LocalizedStringResource("1 photo") : LocalizedStringResource("\(photoCount) photos"),
             image: thumbnailURL.map { DisplayRepresentation.Image(url: $0) }
         )
     }
@@ -43,7 +43,7 @@ nonisolated struct PhotoWidgetEntityQuery: EntityQuery {
     }
 
     func defaultResult() async -> PhotoWidgetEntity? {
-        WidgetStorage.mostRecentWidget(in: WidgetStorage.loadWidgets()).map(PhotoWidgetEntity.init)
+        WidgetStorage.defaultWidget(in: WidgetStorage.loadWidgets()).map(PhotoWidgetEntity.init)
     }
 }
 

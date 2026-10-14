@@ -7,11 +7,11 @@ enum EditorTool: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .crop: "Crop"
-        case .filter: "Filters"
-        case .frame: "Frame"
-        case .caption: "Caption"
-        case .timing: "Timing"
+        case .crop: String(localized: "Crop")
+        case .filter: String(localized: "Filters")
+        case .frame: String(localized: "Layout")
+        case .caption: String(localized: "Caption")
+        case .timing: String(localized: "Timing")
         }
     }
 
@@ -19,7 +19,7 @@ enum EditorTool: String, CaseIterable, Identifiable {
         switch self {
         case .crop: "crop"
         case .filter: "camera.filters"
-        case .frame: "square.inset.filled"
+        case .frame: "square.grid.2x2"
         case .caption: "textformat"
         case .timing: "clock.arrow.2.circlepath"
         }
@@ -28,7 +28,7 @@ enum EditorTool: String, CaseIterable, Identifiable {
 
 // MARK: - Tool bar
 
-/// The editor's tabs. The selected tab grows to show its name and the tint glides over to it.
+/// The editor's tabs, each with its name so every tool is easy to find. The tint glides to the selected one.
 struct ToolBar: View {
     @Binding var selection: EditorTool
     @Namespace private var namespace
@@ -42,19 +42,17 @@ struct ToolBar: View {
                     bounces[tool, default: 0] += 1
                     withAnimation(.snappySpring) { selection = tool }
                 } label: {
-                    HStack(spacing: 6) {
+                    VStack(spacing: 3) {
                         Image(systemName: tool.symbol)
                             .font(.system(size: 16, weight: .semibold))
                             .symbolEffect(.bounce, value: bounces[tool, default: 0])
-                        if selected {
-                            Text(tool.title)
-                                .font(.subheadline.weight(.semibold))
-                                .fixedSize()
-                                .transition(.opacity.combined(with: .scale(scale: 0.6, anchor: .leading)))
-                        }
+                            .frame(height: 20)
+                        Text(tool.title)
+                            .font(.caption2.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
                     }
-                    .padding(.horizontal, selected ? 16 : 13)
-                    .padding(.vertical, 11)
+                    .frame(width: 58, height: 48)
                     .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
                     .background {
                         if selected {
@@ -72,7 +70,7 @@ struct ToolBar: View {
             }
         }
         .padding(5)
-        .glassEffect(.regular.interactive(), in: .capsule)
+        .glass(.interactive, in: .capsule)
         .haptic(.selection, trigger: selection)
     }
 }
@@ -103,7 +101,7 @@ private struct PanelButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
+            .glass(.interactive, in: .rect(cornerRadius: 18))
         }
         .buttonStyle(.pressable(scale: 0.94))
         .haptic(.impact(weight: .light), trigger: taps)
@@ -147,7 +145,7 @@ private struct MenuPill<Value: Hashable>: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 9)
             .frame(maxWidth: .infinity)
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
+            .glass(.interactive, in: .rect(cornerRadius: 18))
         }
         .buttonStyle(.plain)
         .animation(.snappySpring, value: selection)
@@ -307,33 +305,50 @@ private struct FilterSwatch: View {
 
 struct FramePanel: View {
     let photo: WidgetPhoto?
+    let photoCount: Int
     @Binding var style: WidgetStyle
     @State private var glow: UIImage?
 
     var body: some View {
-        VStack(spacing: 14) {
-            HStack(spacing: 10) {
-                ForEach(FrameStyle.allCases) { frame in
-                    FrameOption(frame: frame, isSelected: style.frame == frame, photo: photo) {
-                        withAnimation(.morph) { style.frame = frame }
+        ScrollView {
+            VStack(spacing: 14) {
+                ChipPicker(options: CollageLayout.allCases, selection: $style.layout, title: \.title,
+                           symbol: \.symbol, isEnabled: { photoCount >= $0.cellCount })
+
+                HStack(spacing: 10) {
+                    ForEach(FrameStyle.allCases) { frame in
+                        FrameOption(frame: frame, isSelected: style.frame == frame, photo: photo) {
+                            withAnimation(.morph) { style.frame = frame }
+                        }
                     }
                 }
-            }
-            .padding(.horizontal, 20)
+                .padding(.horizontal, 20)
 
-            ZStack {
-                if style.frame == .fullBleed {
-                    Label("Add a border to choose its color", systemImage: "square.dashed")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .transition(.opacity)
-                } else {
-                    matSwatches
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                ZStack {
+                    if style.frame == .fullBleed {
+                        Label("Add a border to choose its color", systemImage: "square.dashed")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .transition(.opacity)
+                    } else {
+                        matSwatches
+                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    }
+                }
+                .frame(height: 48)
+
+                // Tinted Home Screens arrived in iOS 18.
+                if #available(iOS 18.0, *) {
+                    Toggle(isOn: $style.fullColorInTintedMode) {
+                        Label("Keep colors on tinted Home Screen", systemImage: "paintpalette")
+                            .font(.subheadline.weight(.medium))
+                    }
+                    .padding(.horizontal, 20)
                 }
             }
-            .frame(height: 48)
+            .padding(.vertical, 4)
         }
+        .scrollIndicators(.hidden)
         .haptic(.selection, trigger: style.frame)
         .haptic(.selection, trigger: style.mat)
         .task(id: photo?.id) {
@@ -407,7 +422,7 @@ private struct FrameOption: View {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .strokeBorder(.tint, lineWidth: isSelected ? 2 : 0)
             }
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20))
+            .glass(.interactive, in: .rect(cornerRadius: 20))
         }
         .buttonStyle(.pressable(scale: 0.94))
         .accessibilityLabel(frame.title)
@@ -435,49 +450,85 @@ private struct FrameOption: View {
 struct CaptionPanel: View {
     let photo: WidgetPhoto?
     @Binding var style: WidgetStyle
+    /// The selected photo's own caption, for "Per Photo".
+    let photoCaption: Binding<String>?
     @FocusState private var editing: Bool
 
     var body: some View {
-        VStack(spacing: 14) {
-            ChipPicker(options: CaptionMode.allCases, selection: $style.caption, title: \.title)
+        ScrollView {
+            VStack(spacing: 14) {
+                ChipPicker(options: CaptionMode.allCases, selection: $style.caption, title: \.title)
 
-            Group {
-                switch style.caption {
-                case .none:
-                    Label("Add a caption, the date or how long ago it was", systemImage: "text.bubble")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                case .text:
-                    TextField("Write a caption", text: $style.captionText)
-                        .focused($editing)
-                        .submitLabel(.done)
-                        .font(.body.weight(.medium))
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 11)
-                        .glassEffect(.regular.interactive(), in: .capsule)
-                        .padding(.horizontal, 20)
-                case .date, .timeAgo:
-                    if photo != nil, photo?.dateTaken == nil {
-                        Label("This photo doesn't include a date", systemImage: "calendar.badge.exclamationmark")
+                Group {
+                    switch style.caption {
+                    case .none:
+                        Label("Add a caption, the date or a day counter", systemImage: "text.bubble")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                    } else {
-                        fontPicker
+                    case .text:
+                        captionField("Write a caption", text: $style.captionText)
+                    case .perPhoto:
+                        if let photoCaption {
+                            captionField("Caption for this photo", text: photoCaption)
+                        }
+                    case .date, .timeAgo:
+                        if photo != nil, photo?.dateTaken == nil {
+                            Label("This photo doesn't include a date", systemImage: "calendar.badge.exclamationmark")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            fontPicker
+                        }
+                    case .counter:
+                        counterFields
                     }
                 }
-            }
-            .frame(minHeight: 44)
-            .transition(.opacity)
+                .frame(minHeight: 44)
+                .transition(.opacity)
 
-            if style.caption == .text {
-                fontPicker
-                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                if [.text, .perPhoto, .counter].contains(style.caption) {
+                    fontPicker
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                }
             }
+            .padding(.vertical, 2)
         }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
         .animation(.snappySpring, value: style.caption)
         .onChange(of: style.caption) { _, mode in
             if mode == .text, style.captionText.isEmpty { editing = true }
+            if mode == .perPhoto, photoCaption?.wrappedValue.isEmpty == true { editing = true }
         }
+    }
+
+    private func captionField(_ prompt: LocalizedStringKey, text: Binding<String>) -> some View {
+        TextField(prompt, text: text)
+            .focused($editing)
+            .submitLabel(.done)
+            .font(.body.weight(.medium))
+            .padding(.horizontal, 18)
+            .padding(.vertical, 11)
+            .glass(.interactive, in: .capsule)
+            .padding(.horizontal, 20)
+    }
+
+    /// The day to count from or to, and the words after the number.
+    private var counterFields: some View {
+        let future = Calendar.current.startOfDay(for: style.countDate) > Calendar.current.startOfDay(for: .now)
+        let prompt: LocalizedStringKey = future ? "e.g. our trip" : "e.g. together"
+        return HStack(spacing: 10) {
+            DatePicker("Day", selection: $style.countDate, displayedComponents: .date)
+                .labelsHidden()
+            TextField(prompt, text: $style.countLabel)
+                .focused($editing)
+                .submitLabel(.done)
+                .font(.body.weight(.medium))
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .glass(.interactive, in: .capsule)
+        }
+        .padding(.horizontal, 20)
     }
 
     private var fontPicker: some View {
@@ -492,7 +543,7 @@ struct CaptionPanel: View {
                         .frame(maxWidth: .infinity, minHeight: 40)
                         .foregroundStyle(selected ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
                         .background(Capsule().fill(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(.clear)))
-                        .glassEffect(selected ? .identity : .regular.interactive(), in: .capsule)
+                        .glass(selected ? .none : .interactive, in: .capsule)
                 }
                 .buttonStyle(.pressable(scale: 0.9))
                 .accessibilityLabel("\(font.title) font")
@@ -523,7 +574,7 @@ struct TimingPanel: View {
                         nextChangeLabel
                     }
                     .padding(.horizontal, 20)
-                    ChipPicker(options: RotationInterval.allCases, selection: $widget.rotation, title: \.title) { _ in rotates }
+                    ChipPicker(options: RotationInterval.allCases, selection: $widget.rotation, title: \.title, isEnabled: { _ in rotates })
                 }
 
                 HStack(spacing: 10) {
@@ -535,12 +586,6 @@ struct TimingPanel: View {
                 .padding(.horizontal, 20)
                 .disabled(!rotates)
                 .opacity(rotates ? 1 : 0.45)
-
-                Toggle(isOn: $widget.style.fullColorInTintedMode) {
-                    Label("Keep colors on tinted Home Screen", systemImage: "paintpalette")
-                        .font(.subheadline.weight(.medium))
-                }
-                .padding(.horizontal, 20)
             }
             .padding(.vertical, 4)
         }

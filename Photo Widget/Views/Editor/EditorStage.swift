@@ -2,14 +2,18 @@ import SwiftUI
 
 /// The live widget preview. Drag anywhere to reposition, pinch to zoom, double-tap to zoom in or
 /// out. While a finger is down the rest of the photo shows faintly around the widget, edges
-/// rubber-band, and the photo clicks into alignment at the center.
+/// rubber-band, and the photo clicks into alignment at the center. In a collage the selected
+/// photo takes the first cell; tapping another cell selects that photo.
 struct EditorStage: View {
     let widget: PhotoWidgetConfig
     let photo: WidgetPhoto?
+    /// The photos filling the rest of a collage.
+    let others: [WidgetPhoto]
     let size: WidgetSize
     let image: UIImage?
     let isImporting: Bool
     let onCommit: (CropState) -> Void
+    let onSelect: (UUID) -> Void
     let onAddPhotos: () -> Void
 
     /// Accumulated, un-clamped framing while the user is touching the photo.
@@ -28,8 +32,8 @@ struct EditorStage: View {
     var body: some View {
         GeometryReader { proxy in
             let face = faceFrame(in: proxy.size)
-            let layout = WidgetLayout(bounds: face.size, size: size, frame: widget.style.frame)
-            let slot = layout.photoRect.offsetBy(dx: face.minX, dy: face.minY)
+            let layout = WidgetLayout(bounds: face.size, size: size, frame: widget.style.frame, collage: collage)
+            let slot = layout.cells[0].offsetBy(dx: face.minX + layout.photoRect.minX, dy: face.minY + layout.photoRect.minY)
 
             ZStack(alignment: .topLeading) {
                 if let photo {
@@ -47,7 +51,7 @@ struct EditorStage: View {
 
                     CropGuides(snappedX: snappedX, snappedY: snappedY)
                         .frame(width: slot.width, height: slot.height)
-                        .clipShape(RoundedRectangle(cornerRadius: layout.photoRadius, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: collage == .single ? layout.photoRadius : layout.cellRadius, style: .continuous))
                         .offset(x: slot.minX, y: slot.minY)
                         .opacity(interacting ? 1 : 0)
                         .allowsHitTesting(false)
@@ -82,26 +86,42 @@ struct EditorStage: View {
         .haptic(.impact(weight: .light, intensity: 0.6), trigger: atLimit) { !$0 && $1 }
         .accessibilityElement(children: photo == nil ? .contain : .ignore)
         .accessibilityLabel("Widget preview")
-        .accessibilityHint("Drag to reposition the photo, pinch to zoom.")
+        .accessibilityHint(collage == .single
+                           ? Text("Drag to reposition the photo, pinch to zoom.")
+                           : Text("Drag to reposition the selected photo, pinch to zoom. Tap another photo to select it."))
         .accessibilityAdjustableAction { direction in
             guard let photo else { return }
             var crop = photo.crop(for: size)
             crop.zoom *= direction == .increment ? 1.25 : 0.8
-            let aspect = WidgetLayout.canonical(size, frame: widget.style.frame).photoAspect
+            let aspect = WidgetLayout.canonical(size, frame: widget.style.frame, collage: collage).photoAspect
             withAnimation(.snappySpring) { onCommit(crop.clamped(imageAspect: photo.aspect, targetAspect: aspect)) }
         }
     }
 
     // MARK: - Pieces
 
+    /// Shrinks to the photos available, matching what the Home Screen shows.
+    private var collage: CollageLayout {
+        others.isEmpty ? .single : widget.effectiveLayout
+    }
+
     private func faceView(photo: WidgetPhoto, placement: Placement, face: CGRect) -> some View {
         WidgetFace(style: widget.style, size: size,
                    appearance: WidgetAppearance(style: widget.style, photo: photo, size: size),
-                   glow: glow.map(Image.init(uiImage:))) {
-            Color.clear.overlay(alignment: .topLeading) {
-                photoLayer(photo)
-                    .frame(width: placement.size.width, height: placement.size.height)
-                    .offset(x: placement.origin.x, y: placement.origin.y)
+                   glow: glow.map(Image.init(uiImage:)),
+                   collage: collage) { index in
+            if index == 0 {
+                Color.clear.overlay(alignment: .topLeading) {
+                    photoLayer(photo)
+                        .frame(width: placement.size.width, height: placement.size.height)
+                        .offset(x: placement.origin.x, y: placement.origin.y)
+                }
+            } else if others.indices.contains(index - 1) {
+                let other = others[index - 1]
+                CollageCellPreview(photo: other, size: size, style: widget.style)
+                    .contentShape(Rectangle())
+                    .onTapGesture { onSelect(other.id) }
+                    .accessibilityAddTraits(.isButton)
             }
         }
         .frame(width: face.width, height: face.height)
@@ -137,7 +157,7 @@ struct EditorStage: View {
             .contentTransition(.numericText(value: zoom))
             .padding(.horizontal, 11)
             .padding(.vertical, 6)
-            .glassEffect(.regular, in: .capsule)
+            .glass(.regular, in: .capsule)
     }
 
     // MARK: - Geometry
@@ -315,6 +335,36 @@ struct EditorStage: View {
         }
         withAnimation(.spring(response: 0.45, dampingFraction: 0.8)) {
             onCommit(target.clamped(imageAspect: photo.aspect, targetAspect: aspect))
+        }
+    }
+}
+
+/// Another photo in a collage, framed the way it will be on the Home Screen.
+private struct CollageCellPreview: View {
+    let photo: WidgetPhoto
+    let size: WidgetSize
+    let style: WidgetStyle
+    @State private var image: UIImage?
+
+    var body: some View {
+        GeometryReader { proxy in
+            let slot = CGSize(width: max(proxy.size.width, 1), height: max(proxy.size.height, 1))
+            let state = photo.crop(for: size).clamped(imageAspect: photo.aspect, targetAspect: slot.width / slot.height)
+            let placement = EditorStage.placement(state, imageAspect: photo.aspect, slot: slot)
+            Group {
+                if let image {
+                    Image(uiImage: image).resizable().transition(.opacity)
+                } else {
+                    Color(photo.averageColor)
+                }
+            }
+            .frame(width: placement.size.width, height: placement.size.height)
+            .offset(x: placement.origin.x, y: placement.origin.y)
+        }
+        .clipped()
+        .task(id: "\(photo.id)|\(style.filter)|\(style.filterIntensity)") {
+            let loaded = await ImageCache.shared.filteredThumbnail(photo.id, filter: style.filter, intensity: style.filterIntensity)
+            withAnimation(.easeOut(duration: 0.2)) { image = loaded }
         }
     }
 }

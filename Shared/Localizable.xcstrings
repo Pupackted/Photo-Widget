@@ -1,0 +1,2055 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@": {},
+    "%@ Copy": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salinan %@"
+          }
+        }
+      }
+    },
+    "%@ font": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font %@"
+          }
+        }
+      }
+    },
+    "%@ is empty": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ masih kosong"
+          }
+        }
+      }
+    },
+    "%lld": {},
+    "%lld days": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days"
+                }
+              }
+            }
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld hari"
+          }
+        }
+      }
+    },
+    "%lld days %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%#@days@ %2$@"
+          },
+          "substitutions": {
+            "days": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld hari %2$@"
+          }
+        }
+      }
+    },
+    "%lld days to go": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day to go"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days to go"
+                }
+              }
+            }
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld hari lagi"
+          }
+        }
+      }
+    },
+    "%lld days until %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%#@days@ until %2$@"
+          },
+          "substitutions": {
+            "days": {
+              "argNum": 1,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld hari menuju %2$@"
+          }
+        }
+      }
+    },
+    "%lld of %lld photos couldn’t be loaded. If they’re stored in iCloud, check your connection and try adding them again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld of %2$lld photos couldn’t be loaded. If they’re stored in iCloud, check your connection and try adding them again."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld dari %2$lld foto tidak dapat dimuat. Jika foto tersimpan di iCloud, periksa koneksi Anda lalu coba tambahkan lagi."
+          }
+        }
+      }
+    },
+    "%lld photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld foto"
+          }
+        }
+      }
+    },
+    "%lld widgets": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld widget"
+          }
+        }
+      }
+    },
+    "%lld/%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "1 photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 foto"
+          }
+        }
+      }
+    },
+    "1 widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 widget"
+          }
+        }
+      }
+    },
+    "15 min": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "15 mnt"
+          }
+        }
+      }
+    },
+    "3 hours": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 jam"
+          }
+        }
+      }
+    },
+    "30 min": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 mnt"
+          }
+        }
+      }
+    },
+    "6 hours": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 jam"
+          }
+        }
+      }
+    },
+    "A photo couldn’t be added": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto tidak dapat ditambahkan"
+          }
+        }
+      }
+    },
+    "A widget can hold up to %lld photos. Remove a few, or make another widget.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Satu widget bisa berisi hingga %lld foto. Hapus beberapa, atau buat widget lain."
+          }
+        }
+      }
+    },
+    "Aa": {},
+    "About": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tentang"
+          }
+        }
+      }
+    },
+    "Add Photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah Foto"
+          }
+        }
+      }
+    },
+    "Add a border to choose its color": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambahkan bingkai untuk memilih warnanya"
+          }
+        }
+      }
+    },
+    "Add a caption, the date or a day counter": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambahkan keterangan, tanggal, atau hitungan hari"
+          }
+        }
+      }
+    },
+    "Add more photos to rotate": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah foto lagi agar bisa berganti"
+          }
+        }
+      }
+    },
+    "Add photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah foto"
+          }
+        }
+      }
+    },
+    "Add to Home Screen": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambahkan ke Layar Utama"
+          }
+        }
+      }
+    },
+    "Auto": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otomatis"
+          }
+        }
+      }
+    },
+    "Backups": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cadangan"
+          }
+        }
+      }
+    },
+    "Black": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hitam"
+          }
+        }
+      }
+    },
+    "Border": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bingkai"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batal"
+          }
+        }
+      }
+    },
+    "Caption": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teks"
+          }
+        }
+      }
+    },
+    "Caption for this photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keterangan untuk foto ini"
+          }
+        }
+      }
+    },
+    "Change photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganti foto"
+          }
+        }
+      }
+    },
+    "Charcoal": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arang"
+          }
+        }
+      }
+    },
+    "Choose Photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Foto"
+          }
+        }
+      }
+    },
+    "Classic": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasik"
+          }
+        }
+      }
+    },
+    "Coastal": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pesisir"
+          }
+        }
+      }
+    },
+    "Contact Support": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hubungi Dukungan"
+          }
+        }
+      }
+    },
+    "Cover photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto sampul"
+          }
+        }
+      }
+    },
+    "Crop": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Potong"
+          }
+        }
+      }
+    },
+    "Daily": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harian"
+          }
+        }
+      }
+    },
+    "Date": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanggal"
+          }
+        }
+      }
+    },
+    "Day": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hari"
+          }
+        }
+      }
+    },
+    "Day Counter": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hitung Hari"
+          }
+        }
+      }
+    },
+    "Delete": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus"
+          }
+        }
+      }
+    },
+    "Delete Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus Widget"
+          }
+        }
+      }
+    },
+    "Delete “%@”?": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus “%@”?"
+          }
+        }
+      }
+    },
+    "Deleting a widget deletes its photos from the app. Deleting the app removes everything it stored.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menghapus widget akan menghapus fotonya dari app. Menghapus app akan menghapus semua yang disimpannya."
+          }
+        }
+      }
+    },
+    "Deleting your data": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menghapus data Anda"
+          }
+        }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutup"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selesai"
+          }
+        }
+      }
+    },
+    "Drag to reposition the photo, pinch to zoom.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seret untuk menggeser foto, cubit untuk memperbesar."
+          }
+        }
+      }
+    },
+    "Drag to reposition the selected photo, pinch to zoom. Tap another photo to select it.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seret untuk menggeser foto yang dipilih, cubit untuk memperbesar. Ketuk foto lain untuk memilihnya."
+          }
+        }
+      }
+    },
+    "Dream": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mimpi"
+          }
+        }
+      }
+    },
+    "Duo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duo"
+          }
+        }
+      }
+    },
+    "Duplicate": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duplikat"
+          }
+        }
+      }
+    },
+    "Every 15 min": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiap 15 mnt"
+          }
+        }
+      }
+    },
+    "Every 3 hours": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiap 3 jam"
+          }
+        }
+      }
+    },
+    "Every 30 min": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiap 30 mnt"
+          }
+        }
+      }
+    },
+    "Every 6 hours": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiap 6 jam"
+          }
+        }
+      }
+    },
+    "Extra Large": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekstra Besar"
+          }
+        }
+      }
+    },
+    "Faces and subjects stay in frame at every widget size. Fine-tune with a pinch.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wajah dan objek utama tetap terbingkai di setiap ukuran widget. Sesuaikan dengan cubitan."
+          }
+        }
+      }
+    },
+    "Faded": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pudar"
+          }
+        }
+      }
+    },
+    "Feel": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuansa"
+          }
+        }
+      }
+    },
+    "Film": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Film"
+          }
+        }
+      }
+    },
+    "Filters": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter"
+          }
+        }
+      }
+    },
+    "Framed around what matters in the photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dibingkai di sekitar bagian terpenting foto"
+          }
+        }
+      }
+    },
+    "Frames, filters & captions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bingkai, filter & keterangan"
+          }
+        }
+      }
+    },
+    "Full Bleed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penuh"
+          }
+        }
+      }
+    },
+    "Get Started": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mulai"
+          }
+        }
+      }
+    },
+    "Give every widget the feel of a printed keepsake, or count the days to something special.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beri setiap widget nuansa foto cetak kenangan, atau hitung hari menuju momen istimewa."
+          }
+        }
+      }
+    },
+    "Glow": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pendar"
+          }
+        }
+      }
+    },
+    "Golden": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keemasan"
+          }
+        }
+      }
+    },
+    "Grid": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kisi"
+          }
+        }
+      }
+    },
+    "Haptics": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haptik"
+          }
+        }
+      }
+    },
+    "Home Screen": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Layar Utama"
+          }
+        }
+      }
+    },
+    "Home Screen widgets showing it will be empty until you make a new one.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget Layar Utama yang menampilkannya akan kosong sampai Anda membuat widget baru."
+          }
+        }
+      }
+    },
+    "Home Screen widgets showing it will switch to one of your other widgets.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget Layar Utama yang menampilkannya akan beralih ke salah satu widget Anda yang lain."
+          }
+        }
+      }
+    },
+    "Hourly": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiap jam"
+          }
+        }
+      }
+    },
+    "How to Add a Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cara Menambahkan Widget"
+          }
+        }
+      }
+    },
+    "If you back up your device to iCloud or a computer, your widgets are included in that backup like any other app data.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika Anda mencadangkan perangkat ke iCloud atau komputer, widget Anda ikut tersimpan dalam cadangan itu seperti data app lainnya."
+          }
+        }
+      }
+    },
+    "If you have questions about this policy, contact us through the App Store page for Photo Widget.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jika ada pertanyaan tentang kebijakan ini, hubungi kami melalui halaman App Store Photo Widget."
+          }
+        }
+      }
+    },
+    "Importing %lld photos…": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengimpor %lld foto…"
+          }
+        }
+      }
+    },
+    "Importing 1 photo…": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengimpor 1 foto…"
+          }
+        }
+      }
+    },
+    "Importing…": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mengimpor…"
+          }
+        }
+      }
+    },
+    "In Order": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berurutan"
+          }
+        }
+      }
+    },
+    "Intensity": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intensitas"
+          }
+        }
+      }
+    },
+    "Keep colors on tinted Home Screen": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertahankan warna saat Layar Utama diwarnai"
+          }
+        }
+      }
+    },
+    "Large": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Besar"
+          }
+        }
+      }
+    },
+    "Last updated October 2026": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terakhir diperbarui Oktober 2026"
+          }
+        }
+      }
+    },
+    "Layout": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tata Letak"
+          }
+        }
+      }
+    },
+    "Make Cover": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jadikan Sampul"
+          }
+        }
+      }
+    },
+    "Make your first widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buat widget pertama Anda"
+          }
+        }
+      }
+    },
+    "Medium": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sedang"
+          }
+        }
+      }
+    },
+    "More": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lainnya"
+          }
+        }
+      }
+    },
+    "My Photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Saya"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nama"
+          }
+        }
+      }
+    },
+    "Never": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak pernah"
+          }
+        }
+      }
+    },
+    "New Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget Baru"
+          }
+        }
+      }
+    },
+    "Next %@": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berikutnya %@"
+          }
+        }
+      }
+    },
+    "Next Photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Berikutnya"
+          }
+        }
+      }
+    },
+    "No accounts, no tracking": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tanpa akun, tanpa pelacakan"
+          }
+        }
+      }
+    },
+    "No photos yet": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belum ada foto"
+          }
+        }
+      }
+    },
+    "Noir": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noir"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada"
+          }
+        }
+      }
+    },
+    "Nothing you add ever leaves your device.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apa pun yang Anda tambahkan tidak pernah keluar dari perangkat Anda."
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "On Home Screen": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di Layar Utama"
+          }
+        }
+      }
+    },
+    "Only the photos you pick": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanya foto yang Anda pilih"
+          }
+        }
+      }
+    },
+    "Open App": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka App"
+          }
+        }
+      }
+    },
+    "Opens the editor": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Membuka editor"
+          }
+        }
+      }
+    },
+    "Original": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asli"
+          }
+        }
+      }
+    },
+    "Paper": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kertas"
+          }
+        }
+      }
+    },
+    "Per Photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per Foto"
+          }
+        }
+      }
+    },
+    "Photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        }
+      }
+    },
+    "Photo Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo Widget"
+          }
+        }
+      }
+    },
+    "Photo Widget uses the system photo picker, so it never has access to the rest of your library. It only sees the photos you select.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo Widget menggunakan pemilih foto bawaan sistem, jadi tidak pernah bisa mengakses isi perpustakaan foto Anda yang lain. App ini hanya melihat foto yang Anda pilih."
+          }
+        }
+      }
+    },
+    "Photo options": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilihan foto"
+          }
+        }
+      }
+    },
+    "Photo removed": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto dihapus"
+          }
+        }
+      }
+    },
+    "Photos that rotate": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto yang berganti"
+          }
+        }
+      }
+    },
+    "Photos you choose are copied into the app’s private storage on your device so your widgets can show them. They are never uploaded, shared or sent anywhere.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto yang Anda pilih disalin ke penyimpanan pribadi app di perangkat Anda agar widget bisa menampilkannya. Foto tidak pernah diunggah, dibagikan, atau dikirim ke mana pun."
+          }
+        }
+      }
+    },
+    "Pick a few favorite photos and we’ll frame them beautifully for your Home Screen.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih beberapa foto favorit dan kami akan membingkainya dengan indah untuk Layar Utama Anda."
+          }
+        }
+      }
+    },
+    "Pick which of your photo widgets to show.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih widget foto mana yang ditampilkan."
+          }
+        }
+      }
+    },
+    "Pinch, drag or double-tap the photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cubit, seret, atau ketuk dua kali foto"
+          }
+        }
+      }
+    },
+    "Privacy Policy": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kebijakan Privasi"
+          }
+        }
+      }
+    },
+    "Put it on your Home Screen": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasang di Layar Utama"
+          }
+        }
+      }
+    },
+    "Questions": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pertanyaan"
+          }
+        }
+      }
+    },
+    "Rate Photo Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beri Nilai Photo Widget"
+          }
+        }
+      }
+    },
+    "Remove Photo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus Foto"
+          }
+        }
+      }
+    },
+    "Rename": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganti Nama"
+          }
+        }
+      }
+    },
+    "Rename Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganti Nama Widget"
+          }
+        }
+      }
+    },
+    "Reset Framing": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atur Ulang Bingkai"
+          }
+        }
+      }
+    },
+    "Rounded": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bulat"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simpan"
+          }
+        }
+      }
+    },
+    "Script": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sambung"
+          }
+        }
+      }
+    },
+    "Search for Photo Widget and pick a size you like.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cari Photo Widget lalu pilih ukuran yang Anda suka."
+          }
+        }
+      }
+    },
+    "Serif": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serif"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengaturan"
+          }
+        }
+      }
+    },
+    "Show Welcome Again": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tampilkan Sambutan Lagi"
+          }
+        }
+      }
+    },
+    "Show the next photo on all of your photo widgets.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tampilkan foto berikutnya di semua widget foto Anda."
+          }
+        }
+      }
+    },
+    "Shows the next photo on all of your photo widgets.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menampilkan foto berikutnya di semua widget foto Anda."
+          }
+        }
+      }
+    },
+    "Shuffle": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acak"
+          }
+        }
+      }
+    },
+    "Shuffle All Widgets Now": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acak Semua Widget Sekarang"
+          }
+        }
+      }
+    },
+    "Shuffle Photo Widgets": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acak Widget Foto"
+          }
+        }
+      }
+    },
+    "Shuffle Photos": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acak Foto"
+          }
+        }
+      }
+    },
+    "Single": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunggal"
+          }
+        }
+      }
+    },
+    "Small": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kecil"
+          }
+        }
+      }
+    },
+    "Smart framing": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembingkaian pintar"
+          }
+        }
+      }
+    },
+    "Some photos couldn’t be added": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beberapa foto tidak dapat ditambahkan"
+          }
+        }
+      }
+    },
+    "Stays on cover": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tetap di sampul"
+          }
+        }
+      }
+    },
+    "Support": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dukungan"
+          }
+        }
+      }
+    },
+    "Tap Edit in the corner, then Add Widget.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ketuk Edit di pojok, lalu Tambahkan Widget."
+          }
+        }
+      }
+    },
+    "Tap the + button in the top corner.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ketuk tombol + di pojok atas."
+          }
+        }
+      }
+    },
+    "Tap to choose photos in the app": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ketuk untuk memilih foto di app"
+          }
+        }
+      }
+    },
+    "Text": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teks"
+          }
+        }
+      }
+    },
+    "There’s no sign-in, no analytics, no advertising and no third-party code. The app makes no network connections.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada akun, analitik, iklan, atau kode pihak ketiga. App ini tidak membuat koneksi jaringan apa pun."
+          }
+        }
+      }
+    },
+    "This photo doesn't include a date": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto ini tidak memiliki tanggal"
+          }
+        }
+      }
+    },
+    "This widget is full": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget ini sudah penuh"
+          }
+        }
+      }
+    },
+    "Time Ago": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waktu Lalu"
+          }
+        }
+      }
+    },
+    "Timing": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waktu"
+          }
+        }
+      }
+    },
+    "To choose which widget it shows, touch and hold it, then tap Edit Widget.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk memilih widget yang ditampilkan, sentuh dan tahan widget itu, lalu ketuk Edit Widget."
+          }
+        }
+      }
+    },
+    "Today": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hari ini"
+          }
+        }
+      }
+    },
+    "Today · %@": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hari ini · %@"
+          }
+        }
+      }
+    },
+    "Touch and hold an empty part of your Home Screen until the apps jiggle.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sentuh dan tahan bagian kosong Layar Utama sampai app bergoyang."
+          }
+        }
+      }
+    },
+    "Touch and hold the Home Screen, tap Edit, then Add Widget.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sentuh dan tahan Layar Utama, ketuk Edit, lalu Tambahkan Widget."
+          }
+        }
+      }
+    },
+    "Touch and hold the Home Screen, then tap + in the top corner.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sentuh dan tahan Layar Utama, lalu ketuk + di pojok atas."
+          }
+        }
+      }
+    },
+    "Undo": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urungkan"
+          }
+        }
+      }
+    },
+    "Up to 50 photos per widget, one at a time or as a collage, changing through the day — or with a tap.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hingga 50 foto per widget, satu per satu atau sebagai kolase, berganti sepanjang hari — atau dengan sekali ketuk."
+          }
+        }
+      }
+    },
+    "Updating widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memperbarui widget"
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versi"
+          }
+        }
+      }
+    },
+    "Vivid": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerah"
+          }
+        }
+      }
+    },
+    "White": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putih"
+          }
+        }
+      }
+    },
+    "Widget": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget"
+          }
+        }
+      }
+    },
+    "Widget preview": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pratinjau widget"
+          }
+        }
+      }
+    },
+    "Widget size": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ukuran widget"
+          }
+        }
+      }
+    },
+    "Widget updated": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget diperbarui"
+          }
+        }
+      }
+    },
+    "Widgets also work in StandBy and on iPad.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Widget juga berfungsi di StandBy dan iPad."
+          }
+        }
+      }
+    },
+    "Write a caption": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tulis keterangan"
+          }
+        }
+      }
+    },
+    "You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Photo Widget”.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anda juga bisa menambahkan “Acak Foto” ke Pusat Kontrol, atau meminta Siri untuk “Shuffle Photo Widget”."
+          }
+        }
+      }
+    },
+    "You can also ask Siri to “Shuffle Photo Widget”.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anda juga bisa meminta Siri untuk “Shuffle Photo Widget”."
+          }
+        }
+      }
+    },
+    "Your favorite moments, right on your Home Screen.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momen favorit Anda, langsung di Layar Utama."
+          }
+        }
+      }
+    },
+    "Your favorite photos, beautifully framed.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto favorit Anda, terbingkai indah."
+          }
+        }
+      }
+    },
+    "Your photos never leave your device.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Anda tidak pernah keluar dari perangkat."
+          }
+        }
+      }
+    },
+    "Your photos stay on this device. Nothing is uploaded, ever.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Anda tetap di perangkat ini. Tidak ada yang diunggah, selamanya."
+          }
+        }
+      }
+    },
+    "Your photos stay on your device": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto Anda tetap di perangkat Anda"
+          }
+        }
+      }
+    },
+    "e.g. our trip": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mis. liburan kita"
+          }
+        }
+      }
+    },
+    "e.g. together": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mis. bersama"
+          }
+        }
+      }
+    },
+    "filter.instant": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Instant"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instan"
+          }
+        }
+      }
+    },
+    "filter.mono": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Mono"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mono"
+          }
+        }
+      }
+    },
+    "font.mono": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Mono"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mono"
+          }
+        }
+      }
+    },
+    "frame.instant": {
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Instant"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instan"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

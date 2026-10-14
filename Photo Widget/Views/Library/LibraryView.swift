@@ -1,4 +1,5 @@
 import PhotosUI
+import StoreKit
 import SwiftUI
 
 struct LibraryView: View {
@@ -16,6 +17,8 @@ struct LibraryView: View {
     @State private var deleting: PhotoWidgetConfig?
     @State private var appeared = false
     @AppStorage("homeTipDismissed") private var tipDismissed = false
+    @AppStorage("askedForReview") private var askedForReview = false
+    @Environment(\.requestReview) private var requestReview
 
     private let columns = [GridItem(.adaptive(minimum: 330, maximum: 520), spacing: 22)]
 
@@ -57,10 +60,10 @@ struct LibraryView: View {
             }
             .navigationDestination(for: UUID.self) { id in
                 EditorView(widgetID: id)
-                    .navigationTransition(.zoom(sourceID: id, in: zoom))
+                    .zoomTransition(sourceID: id, in: zoom)
             }
         }
-        .photosPicker(isPresented: $showsPicker, selection: $pickerItems, maxSelectionCount: 50,
+        .photosPicker(isPresented: $showsPicker, selection: $pickerItems, maxSelectionCount: PhotoWidgetConfig.maxPhotos,
                       selectionBehavior: .ordered, matching: .images, preferredItemEncoding: .current)
         .onChange(of: pickerItems) { _, items in
             guard !items.isEmpty else { return }
@@ -83,7 +86,9 @@ struct LibraryView: View {
                 if let widget = deleting { withAnimation(.snappySpring) { model.delete(widget.id) } }
             }
         } message: {
-            Text("It will be removed from your Home Screen too.")
+            model.widgets.count > 1
+                ? Text("Home Screen widgets showing it will switch to one of your other widgets.")
+                : Text("Home Screen widgets showing it will be empty until you make a new one.")
         }
         .task {
             appeared = true
@@ -91,6 +96,15 @@ struct LibraryView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await model.refreshPlacedWidgets() } }
+        }
+        .onChange(of: model.placedWidgetIDs.isEmpty) { _, isEmpty in
+            // Their widget made it to the Home Screen: a good moment to ask, once.
+            guard !isEmpty, !askedForReview else { return }
+            askedForReview = true
+            Task {
+                try? await Task.sleep(for: .seconds(1.5))
+                requestReview()
+            }
         }
         .onChange(of: model.pendingRoute, initial: true) { _, route in
             guard let route else { return }
@@ -113,9 +127,7 @@ struct LibraryView: View {
             WidgetCard(widget: widget, isOnHomeScreen: model.placedWidgetIDs.contains(widget.id))
         }
         .buttonStyle(.pressable(scale: 0.97))
-        .matchedTransitionSource(id: widget.id, in: zoom) { source in
-            source.clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
-        }
+        .zoomSource(id: widget.id, in: zoom, cornerRadius: 32)
         .contextMenu {
             Button("Rename", systemImage: "pencil") {
                 renameText = widget.name
@@ -145,7 +157,7 @@ struct LibraryView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
         }
-        .buttonStyle(.glassProminent)
+        .prominentButtonStyle()
         .controlSize(.large)
         .padding(.bottom, 8)
         .transition(.scale.combined(with: .opacity))
@@ -185,12 +197,12 @@ private struct HomeScreenTip: View {
                 Image(systemName: "apps.iphone.badge.plus")
                     .font(.title2)
                     .foregroundStyle(.tint)
-                    .symbolEffect(.wiggle, options: .repeat(.periodic(delay: 3)))
+                    .attentionWiggle()
                     .frame(width: 36)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Put it on your Home Screen")
                         .font(.subheadline.weight(.semibold))
-                    Text("Touch and hold the Home Screen, tap Edit, then Add Widget.")
+                    Text(AddWidgetGuide.shortInstructions)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
@@ -206,7 +218,7 @@ private struct HomeScreenTip: View {
                 .accessibilityLabel("Dismiss")
             }
             .padding(16)
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 24))
+            .glass(.interactive, in: .rect(cornerRadius: 24))
         }
         .buttonStyle(.pressable(scale: 0.98))
         .foregroundStyle(.primary)
@@ -240,7 +252,7 @@ private struct EmptyLibrary: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
             }
-            .buttonStyle(.glassProminent)
+            .prominentButtonStyle()
             .controlSize(.large)
             .entrance(appeared, index: 4)
         }
@@ -269,11 +281,17 @@ private struct LibraryBackdrop: View {
     var body: some View {
         TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { context in
             let t = Float(context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 10_000))
-            MeshGradient(width: 3, height: 3, points: [
-                [0, 0], [0.5 + 0.12 * sin(t * 0.21), 0], [1, 0],
-                [0, 0.5 + 0.1 * cos(t * 0.17)], [0.5 + 0.16 * sin(t * 0.13), 0.45 + 0.14 * cos(t * 0.19)], [1, 0.5 + 0.1 * sin(t * 0.23)],
-                [0, 1], [0.5 + 0.12 * cos(t * 0.15), 1], [1, 1],
-            ], colors: palette)
+            if #available(iOS 18.0, *) {
+                MeshGradient(width: 3, height: 3, points: [
+                    [0, 0], [0.5 + 0.12 * sin(t * 0.21), 0], [1, 0],
+                    [0, 0.5 + 0.1 * cos(t * 0.17)], [0.5 + 0.16 * sin(t * 0.13), 0.45 + 0.14 * cos(t * 0.19)], [1, 0.5 + 0.1 * sin(t * 0.23)],
+                    [0, 1], [0.5 + 0.12 * cos(t * 0.15), 1], [1, 1],
+                ], colors: palette)
+            } else {
+                LinearGradient(colors: [palette[0], palette[4], palette[8]],
+                               startPoint: UnitPoint(x: 0.5 + 0.3 * Double(sin(t * 0.13)), y: 0),
+                               endPoint: UnitPoint(x: 0.5 - 0.3 * Double(sin(t * 0.13)), y: 1))
+            }
         }
         .opacity(colorScheme == .dark ? 0.3 : 0.22)
         .background(Color(.systemGroupedBackground))

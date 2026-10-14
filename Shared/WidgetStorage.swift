@@ -60,9 +60,18 @@ nonisolated enum WidgetStorage {
     }
 
     static func loadWidgets() -> [PhotoWidgetConfig] {
-        guard let data = try? Data(contentsOf: libraryURL),
-              let file = try? JSONDecoder().decode(LibraryFile.self, from: data) else { return [] }
-        return file.widgets
+        loadLibrary() ?? []
+    }
+
+    /// `nil` when a library exists but can't be read. The file is set aside first, so saving a
+    /// fresh library afterwards can never destroy the user's widgets.
+    static func loadLibrary() -> [PhotoWidgetConfig]? {
+        guard let data = try? Data(contentsOf: libraryURL) else { return [] }
+        if let file = try? JSONDecoder().decode(LibraryFile.self, from: data) { return file.widgets }
+        let backup = libraryURL.deletingLastPathComponent()
+            .appendingPathComponent("widgets-unreadable-\(Int(Date().timeIntervalSince1970)).json")
+        try? FileManager.default.copyItem(at: libraryURL, to: backup)
+        return nil
     }
 
     static func saveWidgets(_ widgets: [PhotoWidgetConfig]) {
@@ -70,9 +79,18 @@ nonisolated enum WidgetStorage {
         try? data.write(to: libraryURL, options: .atomic)
     }
 
-    /// The widget a Home Screen widget falls back to when the user hasn't picked one.
-    static func mostRecentWidget(in widgets: [PhotoWidgetConfig]) -> PhotoWidgetConfig? {
-        widgets.max { $0.modifiedAt < $1.modifiedAt }
+    /// What a Home Screen widget shows when the user hasn't picked one, or picked one that was
+    /// since deleted: the first widget they made that has photos. It only changes if that widget
+    /// is deleted, so editing or creating other widgets never swaps out what's on the Home Screen.
+    static func defaultWidget(in widgets: [PhotoWidgetConfig]) -> PhotoWidgetConfig? {
+        widgets.filter { !$0.photos.isEmpty }.min { $0.createdAt < $1.createdAt }
+            ?? widgets.min { $0.createdAt < $1.createdAt }
+    }
+
+    /// The widget a Home Screen widget configured with `chosen` displays.
+    static func resolve(_ chosen: UUID?, in widgets: [PhotoWidgetConfig]) -> PhotoWidgetConfig? {
+        if let chosen, let widget = widgets.first(where: { $0.id == chosen }) { return widget }
+        return defaultWidget(in: widgets)
     }
 
     // MARK: - Tap to advance

@@ -12,6 +12,8 @@ import SwiftUI
 struct PhotoWidgetBundle: WidgetBundle {
     var body: some Widget {
         PhotoWidget()
-        ShufflePhotosControl()
+        if #available(iOS 18.0, *) {
+            ShufflePhotosControl()
+        }
     }
 }

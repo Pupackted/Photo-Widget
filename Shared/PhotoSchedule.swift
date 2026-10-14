@@ -1,24 +1,41 @@
 import Foundation
 
-/// Decides which photo a widget shows at any moment. Pure and deterministic, so the app's
+/// Decides which photos a widget shows at any moment. Pure and deterministic, so the app's
 /// previews and the widget extension always agree without sharing any runtime state.
 nonisolated enum PhotoSchedule {
 
     static func index(for config: PhotoWidgetConfig, at date: Date, offset: Int = 0) -> Int {
+        indices(for: config, at: date, offset: offset).first ?? 0
+    }
+
+    /// The photos on screen at `date`, one per collage cell, never repeating a photo.
+    /// Each rotation (or tap) moves on by a whole page, so a collage shows fresh photos every time.
+    static func indices(for config: PhotoWidgetConfig, at date: Date, offset: Int = 0) -> [Int] {
         let count = config.photos.count
-        guard count > 1 else { return 0 }
+        guard count > 1 else { return count == 1 ? [0] : [] }
 
+        let cells = config.effectiveLayout.cellCount
         // A widget that never rotates stays on its cover until tapped.
-        guard config.rotation != .never else { return mod(offset, count) }
+        let page = (config.rotation == .never ? 0 : slot(at: date, interval: config.rotation)) + offset
 
-        let step = slot(at: date, interval: config.rotation) + offset
-        switch config.order {
-        case .inOrder:
-            return mod(step, count)
-        case .shuffle:
-            let cycle = floorDiv(step, count)
-            return shuffled(count: count, seed: seed(for: config.id), cycle: cycle)[mod(step, count)]
+        var result: [Int] = []
+        var step = page * cells
+        // Two consecutive shuffle cycles always contain every photo, so this finds `cells` distinct ones.
+        while result.count < cells, step < page * cells + 2 * count {
+            let index = position(step, config: config)
+            if !result.contains(index) { result.append(index) }
+            step += 1
         }
+        return result
+    }
+
+    private static func position(_ step: Int, config: PhotoWidgetConfig) -> Int {
+        let count = config.photos.count
+        // A widget that never rotates walks through from its cover; with two photos the only
+        // order that never repeats a photo is plain alternation.
+        guard config.order == .shuffle, config.rotation != .never, count > 2 else { return mod(step, count) }
+        let cycle = floorDiv(step, count)
+        return shuffled(count: count, seed: seed(for: config.id), cycle: cycle)[mod(step, count)]
     }
 
     /// Dates at which the widget should show a new photo, starting with `date` itself.
@@ -31,6 +48,22 @@ nonisolated enum PhotoSchedule {
             cursor = next
         }
         return dates
+    }
+
+    /// Every moment the widget looks different: each photo change, plus each midnight while the
+    /// caption counts days ("Yesterday", "12 days to go").
+    static func timelineDates(for config: PhotoWidgetConfig, from date: Date, calendar: Calendar = .current) -> [Date] {
+        var dates = config.photos.count > 1 ? entryDates(from: date, interval: config.rotation, calendar: calendar) : [date]
+        guard config.style.captionChangesDaily else { return dates }
+
+        // Follow the photo changes, or a week ahead when the photo never changes on its own.
+        let horizon = dates.count > 1 ? dates[dates.count - 1] : date.addingTimeInterval(7 * 86_400)
+        var midnight = calendar.startOfDay(for: date)
+        while let next = calendar.date(byAdding: .day, value: 1, to: midnight), next <= horizon {
+            dates.append(next)
+            midnight = next
+        }
+        return Array(Set(dates)).sorted()
     }
 
     static func nextChange(after date: Date, interval: RotationInterval, calendar: Calendar = .current) -> Date? {
@@ -69,7 +102,8 @@ nonisolated enum PhotoSchedule {
     private static func shuffled(count: Int, seed: UInt64, cycle: Int) -> [Int] {
         var order = permutation(count: count, seed: seed &+ UInt64(bitPattern: Int64(cycle)) &* 0x9E37_79B9_7F4A_7C15)
         let previous = permutation(count: count, seed: seed &+ UInt64(bitPattern: Int64(cycle - 1)) &* 0x9E37_79B9_7F4A_7C15)
-        if order.first == previous.last, count > 1 { order.swapAt(0, 1) }
+        // Swapping the first two never moves the last one (count > 2), so `previous.last` is what was really shown.
+        if order.first == previous.last { order.swapAt(0, 1) }
         return order
     }
 

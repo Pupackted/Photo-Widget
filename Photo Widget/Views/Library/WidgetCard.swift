@@ -8,10 +8,10 @@ struct WidgetCard: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 30)) { context in
-            let photo = widget.currentPhoto(at: context.date, offset: WidgetStorage.tapOffset(for: widget.id))
+            let photos = widget.currentPhotos(at: context.date, offset: WidgetStorage.tapOffset(for: widget.id))
 
             VStack(alignment: .leading, spacing: 18) {
-                WidgetPreview(widget: widget, photo: photo, size: .medium)
+                WidgetPreview(widget: widget, photos: photos, size: .medium)
                     .shadow(color: .black.opacity(0.3), radius: 20, y: 12)
                     .padding(.horizontal, 6)
 
@@ -31,7 +31,7 @@ struct WidgetCard: View {
                             .font(.caption.weight(.semibold))
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .glassEffect(.clear, in: .capsule)
+                            .glass(.clear, in: .capsule)
                             .transition(.scale.combined(with: .opacity))
                     }
                 }
@@ -39,7 +39,7 @@ struct WidgetCard: View {
             }
             .padding(18)
             .foregroundStyle(.white)
-            .background { CardBackdrop(photoID: photo?.id, fallback: photo?.averageColor) }
+            .background { CardBackdrop(photoID: photos.first?.id, fallback: photos.first?.averageColor) }
             .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
             // Taps land exactly on the visible card, never on photo overflow from a neighbour.
             .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
@@ -54,9 +54,9 @@ struct WidgetCard: View {
 
     private var subtitle: String {
         if let importing = model.importing[widget.id], importing > 0 {
-            return "Importing \(importing) photo\(importing == 1 ? "" : "s")…"
+            return importing == 1 ? String(localized: "Importing 1 photo…") : String(localized: "Importing \(importing) photos…")
         }
-        return widget.photos.isEmpty ? "No photos yet" : widget.summary
+        return widget.photos.isEmpty ? String(localized: "No photos yet") : widget.summary
     }
 }
 

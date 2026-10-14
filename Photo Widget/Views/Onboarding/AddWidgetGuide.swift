@@ -4,12 +4,28 @@ import SwiftUI
 struct AddWidgetGuide: View {
     @Environment(\.dismiss) private var dismiss
 
-    private let steps: [(symbol: String, text: String)] = [
-        ("hand.tap", "Touch and hold an empty part of your Home Screen until the apps jiggle."),
-        ("plus.circle", "Tap Edit in the corner, then Add Widget."),
-        ("magnifyingglass", "Search for Photo Widget and pick a size you like."),
-        ("slider.horizontal.3", "To choose which widget it shows, touch and hold it, then tap Edit Widget."),
-    ]
+    /// One line for tips. The Home Screen's Edit menu arrived in iOS 18; before that it's a + button.
+    static var shortInstructions: LocalizedStringKey {
+        if #available(iOS 18.0, *) {
+            "Touch and hold the Home Screen, tap Edit, then Add Widget."
+        } else {
+            "Touch and hold the Home Screen, then tap + in the top corner."
+        }
+    }
+
+    private var steps: [(symbol: String, text: LocalizedStringKey)] {
+        let add: LocalizedStringKey = if #available(iOS 18.0, *) {
+            "Tap Edit in the corner, then Add Widget."
+        } else {
+            "Tap the + button in the top corner."
+        }
+        return [
+            ("hand.tap", "Touch and hold an empty part of your Home Screen until the apps jiggle."),
+            ("plus.circle", add),
+            ("magnifyingglass", "Search for Photo Widget and pick a size you like."),
+            ("slider.horizontal.3", "To choose which widget it shows, touch and hold it, then tap Edit Widget."),
+        ]
+    }
 
     var body: some View {
         NavigationStack {
@@ -49,7 +65,7 @@ struct AddWidgetGuide: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark") { dismiss() }
+                    DoneButton { dismiss() }
                 }
             }
         }

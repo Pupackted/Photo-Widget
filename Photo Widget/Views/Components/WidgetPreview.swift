@@ -14,22 +14,26 @@ struct WidgetOutline: Shape {
 /// A widget exactly as it looks on the Home Screen, drawn from the images the app rendered for it.
 struct WidgetPreview: View {
     let widget: PhotoWidgetConfig
-    let photo: WidgetPhoto?
+    /// The photos on screen, one per collage cell.
+    let photos: [WidgetPhoto]
     let size: WidgetSize
     @Environment(AppModel.self) private var model
     @State private var glow: UIImage?
 
     var body: some View {
         Group {
-            if let photo {
+            if let lead = photos.first {
                 WidgetFace(style: widget.style, size: size,
-                           appearance: WidgetAppearance(style: widget.style, photo: photo, size: size),
-                           glow: glow.map(Image.init(uiImage:))) {
-                    RenderedPhoto(widgetID: widget.id, photo: photo, size: size,
-                                  generation: model.renderGeneration[widget.id] ?? 0)
+                           appearance: WidgetAppearance(style: widget.style, photo: lead, size: size),
+                           glow: glow.map(Image.init(uiImage:)),
+                           collage: widget.effectiveLayout) { index in
+                    if photos.indices.contains(index) {
+                        RenderedPhoto(widgetID: widget.id, photo: photos[index], size: size,
+                                      generation: model.renderGeneration[widget.id] ?? 0)
+                    }
                 }
-                .task(id: "\(photo.id)\(widget.style.mat)") {
-                    glow = widget.style.mat == .glow ? await ImageCache.shared.glow(photo.id) : nil
+                .task(id: "\(lead.id)\(widget.style.mat)") {
+                    glow = widget.style.mat == .glow ? await ImageCache.shared.glow(lead.id) : nil
                 }
             } else {
                 EmptyWidgetFace(isImporting: (model.importing[widget.id] ?? 0) > 0)
@@ -86,7 +90,7 @@ struct EmptyWidgetFace: View {
                     Image(systemName: "photo.badge.plus")
                         .font(.title2.weight(.medium))
                 }
-                Text(isImporting ? "Importing…" : "No photos yet")
+                isImporting ? Text("Importing…") : Text("No photos yet")
                     .font(.subheadline.weight(.semibold))
             }
             .foregroundStyle(.white)

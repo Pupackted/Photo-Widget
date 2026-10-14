@@ -3,6 +3,7 @@ import SwiftUI
 import WidgetKit
 
 /// Control Center button that moves every photo widget on to its next photo.
+@available(iOS 18.0, *)
 struct ShufflePhotosControl: ControlWidget {
     static let kind = "Adrian.Photo-Widget.Shuffle"
 

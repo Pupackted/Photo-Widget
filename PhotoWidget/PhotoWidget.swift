@@ -6,7 +6,8 @@ import SwiftUI
 
 struct PhotoEntry: TimelineEntry {
     enum Content {
-        case photo(PhotoWidgetConfig, WidgetPhoto)
+        /// The photos on screen, one per collage cell.
+        case photos(PhotoWidgetConfig, [WidgetPhoto])
         /// A widget with no photos yet, or none created at all.
         case empty(PhotoWidgetConfig?)
         /// Shown in the widget gallery before the user has made anything.
@@ -24,8 +25,9 @@ struct PhotoTimelineProvider: AppIntentTimelineProvider {
 
     func snapshot(for configuration: SelectPhotoWidgetIntent, in context: Context) async -> PhotoEntry {
         let widget = resolve(configuration)
-        if let widget, let photo = widget.currentPhoto(offset: WidgetStorage.tapOffset(for: widget.id)) {
-            return PhotoEntry(date: .now, content: .photo(widget, photo))
+        if let widget, !widget.photos.isEmpty {
+            let photos = widget.currentPhotos(offset: WidgetStorage.tapOffset(for: widget.id))
+            return PhotoEntry(date: .now, content: .photos(widget, photos))
         }
         return PhotoEntry(date: .now, content: context.isPreview ? .sample(.sunset) : .empty(widget))
     }
@@ -36,21 +38,15 @@ struct PhotoTimelineProvider: AppIntentTimelineProvider {
         }
 
         let offset = WidgetStorage.tapOffset(for: widget.id)
-        let dates = widget.photos.count > 1
-            ? PhotoSchedule.entryDates(from: .now, interval: widget.rotation)
-            : [.now]
-        let entries = dates.compactMap { date in
-            widget.currentPhoto(at: date, offset: offset).map { PhotoEntry(date: date, content: .photo(widget, $0)) }
+        let dates = PhotoSchedule.timelineDates(for: widget, from: .now)
+        let entries = dates.map { date in
+            PhotoEntry(date: date, content: .photos(widget, widget.currentPhotos(at: date, offset: offset)))
         }
         return Timeline(entries: entries, policy: dates.count > 1 ? .atEnd : .never)
     }
 
     private func resolve(_ configuration: SelectPhotoWidgetIntent) -> PhotoWidgetConfig? {
-        let widgets = WidgetStorage.loadWidgets()
-        if let chosen = configuration.widget {
-            return widgets.first { $0.id == chosen.id }
-        }
-        return WidgetStorage.mostRecentWidget(in: widgets)
+        WidgetStorage.resolve(configuration.widget?.id, in: WidgetStorage.loadWidgets())
     }
 }
 
@@ -71,8 +67,8 @@ struct PhotoWidgetView: View {
 
     var body: some View {
         switch entry.content {
-        case let .photo(widget, photo):
-            PhotoFace(widget: widget, photo: photo, size: size, date: entry.date)
+        case let .photos(widget, photos):
+            PhotoFace(widget: widget, photos: photos, size: size, date: entry.date)
         case let .empty(widget):
             EmptyFace(widget: widget, size: size)
         case let .sample(scene):
@@ -83,19 +79,23 @@ struct PhotoWidgetView: View {
 
 private struct PhotoFace: View {
     let widget: PhotoWidgetConfig
-    let photo: WidgetPhoto
+    let photos: [WidgetPhoto]
     let size: WidgetSize
     let date: Date
 
     var body: some View {
-        let appearance = WidgetAppearance(style: widget.style, photo: photo, size: size, date: date)
-        let glow = widget.style.mat == .glow ? UIImage(contentsOfFile: WidgetStorage.glowURL(photo.id).path) : nil
+        let lead = photos.first
+        let appearance = WidgetAppearance(style: widget.style, photo: lead, size: size, date: date)
+        let glow = widget.style.mat == .glow ? lead.flatMap { UIImage(contentsOfFile: WidgetStorage.glowURL($0.id).path) } : nil
 
         tappable {
-            WidgetFace(style: widget.style, size: size, appearance: appearance, isWidget: true) {
-                photoImage
-                    .id(photo.id)
-                    .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 1.08)), removal: .opacity))
+            WidgetFace(style: widget.style, size: size, appearance: appearance, isWidget: true,
+                       collage: widget.effectiveLayout) { index in
+                if photos.indices.contains(index) {
+                    photoImage(photos[index])
+                        .id(photos[index].id)
+                        .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 1.08)), removal: .opacity))
+                }
             }
         }
         .containerBackground(for: .widget) {
@@ -105,13 +105,13 @@ private struct PhotoFace: View {
     }
 
     @ViewBuilder
-    private var photoImage: some View {
+    private func photoImage(_ photo: WidgetPhoto) -> some View {
         let rendered = UIImage(contentsOfFile: WidgetStorage.renderURL(widget: widget.id, photo: photo.id, size: size).path)
         // Fall back to the thumbnail if the app hasn't finished rendering this size yet.
         if let image = rendered ?? UIImage(contentsOfFile: WidgetStorage.thumbnailURL(photo.id).path) {
             Image(uiImage: image)
                 .resizable()
-                .widgetAccentedRenderingMode(widget.style.fullColorInTintedMode ? .fullColor : .desaturated)
+                .accentedRendering(fullColor: widget.style.fullColorInTintedMode)
                 .scaledToFill()
         } else {
             Color(photo.averageColor)
@@ -120,11 +120,23 @@ private struct PhotoFace: View {
 
     @ViewBuilder
     private func tappable<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-        if widget.tapAction == .nextPhoto, widget.photos.count > 1 {
+        if widget.tapAction == .nextPhoto, widget.photos.count > widget.effectiveLayout.cellCount {
             Button(intent: NextPhotoIntent(widgetID: widget.id), label: content)
                 .buttonStyle(.plain)
         } else {
             content()
+        }
+    }
+}
+
+private extension Image {
+    /// On a tinted Home Screen (iOS 18+), either keep the photo's colors or let it take the tint.
+    @ViewBuilder
+    func accentedRendering(fullColor: Bool) -> some View {
+        if #available(iOS 18.0, *) {
+            widgetAccentedRenderingMode(fullColor ? .fullColor : .desaturated)
+        } else {
+            self
         }
     }
 }
@@ -138,7 +150,7 @@ private struct EmptyFace: View {
             Image(systemName: "photo.badge.plus")
                 .font(.system(size: size == .small ? 30 : 34, weight: .medium))
                 .foregroundStyle(.white.opacity(0.95))
-            Text(widget.map { "\($0.name) is empty" } ?? "Add Photos")
+            Text(widget.map { String(localized: "\($0.name) is empty") } ?? String(localized: "Add Photos"))
                 .font(.system(.subheadline, design: .rounded, weight: .semibold))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)

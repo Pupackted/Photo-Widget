@@ -4,10 +4,10 @@ struct OnboardingView: View {
     let onFinish: () -> Void
     @State private var appeared = false
 
-    private let features: [(symbol: String, title: String, detail: String)] = [
-        ("photo.stack", "Photos that rotate", "Add up to 50 photos and let them change through the day — or tap to shuffle."),
+    private let features: [(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey)] = [
+        ("photo.stack", "Photos that rotate", "Up to 50 photos per widget, one at a time or as a collage, changing through the day — or with a tap."),
         ("sparkles", "Smart framing", "Faces and subjects stay in frame at every widget size. Fine-tune with a pinch."),
-        ("paintpalette", "Frames, filters & captions", "Give every widget the feel of a printed keepsake."),
+        ("paintpalette", "Frames, filters & captions", "Give every widget the feel of a printed keepsake, or count the days to something special."),
     ]
 
     var body: some View {
@@ -49,7 +49,7 @@ struct OnboardingView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollIndicators(.hidden)
-        .safeAreaBar(edge: .bottom) {
+        .bottomBar {
             VStack(spacing: 10) {
                 Button(action: onFinish) {
                     Text("Get Started")
@@ -57,7 +57,7 @@ struct OnboardingView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
-                .buttonStyle(.glassProminent)
+                .prominentButtonStyle()
                 .controlSize(.large)
 
                 Label("Your photos never leave your device.", systemImage: "lock.fill")

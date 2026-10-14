@@ -13,8 +13,11 @@ nonisolated struct WidgetLayout {
     let captionRect: CGRect
     let photoRadius: CGFloat
     let captionPointSize: CGFloat
+    /// One rectangle per photo, relative to `photoRect`. A single photo fills it.
+    let cells: [CGRect]
+    let cellRadius: CGFloat
 
-    init(bounds: CGSize, size: WidgetSize, frame: FrameStyle) {
+    init(bounds: CGSize, size: WidgetSize, frame: FrameStyle, collage: CollageLayout = .single) {
         let canonical = size.canonicalSize
         let scale = max(min(bounds.width / canonical.width, bounds.height / canonical.height), 0.01)
         let roomy = size == .large || size == .extraLarge
@@ -47,14 +50,37 @@ nonisolated struct WidgetLayout {
         case .polaroid: 5 * scale
         }
         self.captionPointSize = size.captionPointSize * scale
+        self.cells = Self.cells(in: photoRect.size, collage: collage, gap: (frame == .fullBleed ? 3 : 6) * scale)
+        self.cellRadius = collage == .single || frame == .fullBleed ? 0 : 4 * scale
     }
 
     /// Layout at the reference size a widget image is rendered for.
-    static func canonical(_ size: WidgetSize, frame: FrameStyle) -> WidgetLayout {
-        WidgetLayout(bounds: size.canonicalSize, size: size, frame: frame)
+    static func canonical(_ size: WidgetSize, frame: FrameStyle, collage: CollageLayout = .single) -> WidgetLayout {
+        WidgetLayout(bounds: size.canonicalSize, size: size, frame: frame, collage: collage)
     }
 
-    var photoAspect: Double { photoRect.width / photoRect.height }
+    /// Aspect ratio of each photo. Every cell in a collage has the same shape, so a photo
+    /// rendered once fits whichever cell it lands in.
+    var photoAspect: Double { cells[0].width / cells[0].height }
+
+    /// Two photos split along the longer side; four make a grid.
+    private static func cells(in area: CGSize, collage: CollageLayout, gap: CGFloat) -> [CGRect] {
+        let w = area.width, h = area.height
+        switch collage {
+        case .single:
+            return [CGRect(origin: .zero, size: area)]
+        case .duo where h > w:
+            let half = max((h - gap) / 2, 1)
+            return [CGRect(x: 0, y: 0, width: w, height: half), CGRect(x: 0, y: half + gap, width: w, height: half)]
+        case .duo:
+            let half = max((w - gap) / 2, 1)
+            return [CGRect(x: 0, y: 0, width: half, height: h), CGRect(x: half + gap, y: 0, width: half, height: h)]
+        case .quad:
+            let cw = max((w - gap) / 2, 1), ch = max((h - gap) / 2, 1)
+            return [CGRect(x: 0, y: 0, width: cw, height: ch), CGRect(x: cw + gap, y: 0, width: cw, height: ch),
+                    CGRect(x: 0, y: ch + gap, width: cw, height: ch), CGRect(x: cw + gap, y: ch + gap, width: cw, height: ch)]
+        }
+    }
 }
 
 // MARK: - Appearance
@@ -105,15 +131,34 @@ struct WidgetAppearance {
             return size == .small
                 ? taken.formatted(.dateTime.month(.abbreviated).day().year())
                 : taken.formatted(date: .long, time: .omitted)
+        case .perPhoto:
+            let text = photo?.caption.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return text.isEmpty ? nil : text
         case .timeAgo:
             guard let taken = photo?.dateTaken else { return nil }
-            if Calendar.current.isDate(taken, inSameDayAs: date) { return "Today" }
+            if Calendar.current.isDate(taken, inSameDayAs: date) { return String(localized: "Today") }
             let formatter = RelativeDateTimeFormatter()
             formatter.dateTimeStyle = .named
             formatter.unitsStyle = .full
             let text = formatter.localizedString(for: taken, relativeTo: date)
             return text.prefix(1).uppercased() + text.dropFirst()
+        case .counter:
+            return counterText(to: style.countDate, label: style.countLabel, on: date)
         }
+    }
+
+    /// "12 days until Bali", "1204 days together", "Today".
+    static func counterText(to target: Date, label: String, on date: Date, calendar: Calendar = .current) -> String {
+        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: target)).day ?? 0
+        let label = label.trimmingCharacters(in: .whitespacesAndNewlines)
+        if days > 0 {
+            return label.isEmpty ? String(localized: "\(days) days to go") : String(localized: "\(days) days until \(label)")
+        }
+        if days < 0 {
+            let elapsed = -days
+            return label.isEmpty ? String(localized: "\(elapsed) days") : String(localized: "\(elapsed) days \(label)")
+        }
+        return label.isEmpty ? String(localized: "Today") : String(localized: "Today · \(label)")
     }
 }
 
@@ -147,25 +192,52 @@ struct WidgetFace<Photo: View>: View {
     var glow: Image?
     /// Inside a real widget the mat is the container background and corners follow the container shape.
     var isWidget = false
-    @ViewBuilder var photo: () -> Photo
+    var collage: CollageLayout = .single
+    /// The photo for each collage cell.
+    @ViewBuilder var cell: (Int) -> Photo
+
+    init(style: WidgetStyle, size: WidgetSize, appearance: WidgetAppearance, glow: Image? = nil,
+         isWidget: Bool = false, collage: CollageLayout, @ViewBuilder cell: @escaping (Int) -> Photo) {
+        self.style = style
+        self.size = size
+        self.appearance = appearance
+        self.glow = glow
+        self.isWidget = isWidget
+        self.collage = collage
+        self.cell = cell
+    }
+
+    /// A face showing one photo.
+    init(style: WidgetStyle, size: WidgetSize, appearance: WidgetAppearance, glow: Image? = nil,
+         isWidget: Bool = false, @ViewBuilder photo: @escaping () -> Photo) {
+        self.init(style: style, size: size, appearance: appearance, glow: glow, isWidget: isWidget, collage: .single) { _ in photo() }
+    }
 
     var body: some View {
         GeometryReader { proxy in
-            let layout = WidgetLayout(bounds: proxy.size, size: size, frame: style.frame)
+            let layout = WidgetLayout(bounds: proxy.size, size: size, frame: style.frame, collage: collage)
             ZStack(alignment: .topLeading) {
                 if !isWidget {
                     WidgetMat(mat: style.mat, color: appearance.matColor, glow: glow)
                 }
 
-                photo()
-                    .frame(width: layout.photoRect.width, height: layout.photoRect.height)
-                    .overlay(alignment: .bottomLeading) {
-                        if style.frame != .polaroid, let caption = appearance.caption {
-                            overlayCaption(caption, layout: layout)
-                        }
+                ZStack(alignment: .topLeading) {
+                    ForEach(layout.cells.indices, id: \.self) { index in
+                        let rect = layout.cells[index]
+                        cell(index)
+                            .frame(width: rect.width, height: rect.height)
+                            .clipShape(RoundedRectangle(cornerRadius: layout.cellRadius, style: .continuous))
+                            .offset(x: rect.minX, y: rect.minY)
                     }
-                    .clipShape(photoShape(layout))
-                    .offset(x: layout.photoRect.minX, y: layout.photoRect.minY)
+                }
+                .frame(width: layout.photoRect.width, height: layout.photoRect.height, alignment: .topLeading)
+                .overlay(alignment: .bottomLeading) {
+                    if style.frame != .polaroid, let caption = appearance.caption {
+                        overlayCaption(caption, layout: layout)
+                    }
+                }
+                .clipShape(photoShape(layout))
+                .offset(x: layout.photoRect.minX, y: layout.photoRect.minY)
 
                 if style.frame == .polaroid, let caption = appearance.caption {
                     Text(caption)

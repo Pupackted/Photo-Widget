@@ -76,11 +76,11 @@ nonisolated enum RenderEngine {
 
     // MARK: - Widget renders
 
-    /// The photo slot of a widget, exactly as it will appear on the Home Screen.
-    static func renderPhoto(_ source: CGImage, photo: WidgetPhoto, size: WidgetSize, style: WidgetStyle) -> CGImage? {
-        let layout = WidgetLayout.canonical(size, frame: style.frame)
-        let output = CGSize(width: (layout.photoRect.width * size.renderScale).rounded(),
-                            height: (layout.photoRect.height * size.renderScale).rounded())
+    /// One photo cell of a widget, exactly as it will appear on the Home Screen.
+    static func renderPhoto(_ source: CGImage, photo: WidgetPhoto, size: WidgetSize, style: WidgetStyle, collage: CollageLayout) -> CGImage? {
+        let layout = WidgetLayout.canonical(size, frame: style.frame, collage: collage)
+        let output = CGSize(width: (layout.cells[0].width * size.renderScale).rounded(),
+                            height: (layout.cells[0].height * size.renderScale).rounded())
         let crop = photo.crop(for: size).clamped(imageAspect: photo.aspect, targetAspect: layout.photoAspect)
         let unit = crop.rect(imageAspect: photo.aspect, targetAspect: layout.photoAspect)
 

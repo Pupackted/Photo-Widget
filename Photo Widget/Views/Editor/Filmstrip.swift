@@ -1,14 +1,19 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
-/// The widget's photos in order. The first one is the cover.
+/// The widget's photos in order. The first one is the cover. Drag a photo to reorder; the
+/// selected photo carries a menu with everything else you can do to it.
 struct Filmstrip: View {
     let photos: [WidgetPhoto]
     @Binding var selection: UUID?
     let importingCount: Int
     let onAdd: () -> Void
+    let onMove: (_ photo: UUID, _ target: UUID) -> Void
     let onMakeCover: (UUID) -> Void
     let onResetFraming: (UUID) -> Void
     let onRemove: (UUID) -> Void
+
+    @State private var dragging: UUID?
 
     private var selectedID: UUID? { selection ?? photos.first?.id }
 
@@ -19,6 +24,15 @@ struct Filmstrip: View {
                     ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
                         tile(photo, isCover: index == 0, isSelected: photo.id == selectedID)
                             .id(photo.id)
+                            .onDrag {
+                                dragging = photo.id
+                                return NSItemProvider(object: photo.id.uuidString as NSString)
+                            } preview: {
+                                PhotoThumbnail(photo: photo)
+                                    .frame(width: 50, height: 64)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                            .onDrop(of: [.text], delegate: ReorderDropDelegate(target: photo.id, dragging: $dragging, onMove: onMove))
                             .transition(.scale(scale: 0.3).combined(with: .opacity))
                     }
                     ForEach(0..<importingCount, id: \.self) { _ in
@@ -39,6 +53,7 @@ struct Filmstrip: View {
             }
         }
         .haptic(.selection, trigger: selection)
+        .haptic(.impact(weight: .light), trigger: photos.map(\.id)) { old, new in Set(old) == Set(new) && old != new }
     }
 
     private func tile(_ photo: WidgetPhoto, isCover: Bool, isSelected: Bool) -> some View {
@@ -66,20 +81,48 @@ struct Filmstrip: View {
                 .shadow(color: .black.opacity(isSelected ? 0.25 : 0.1), radius: isSelected ? 8 : 3, y: isSelected ? 4 : 1)
         }
         .buttonStyle(.pressable(scale: 0.88))
-        .contextMenu {
-            if !isCover {
-                Button("Make Cover", systemImage: "star") { onMakeCover(photo.id) }
+        .overlay(alignment: .topTrailing) {
+            if isSelected {
+                Menu {
+                    actions(for: photo, isCover: isCover)
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 9, weight: .heavy))
+                        .foregroundStyle(.primary)
+                        .frame(width: 20, height: 20)
+                        .background(.regularMaterial, in: Circle())
+                        .shadow(color: .black.opacity(0.2), radius: 2, y: 1)
+                        // A bigger target than it looks.
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .offset(x: 12, y: -12)
+                .accessibilityLabel("Photo options")
+                .transition(.scale.combined(with: .opacity))
             }
-            Button("Reset Framing", systemImage: "arrow.counterclockwise") { onResetFraming(photo.id) }
-            Divider()
-            Button("Remove Photo", systemImage: "trash", role: .destructive) { onRemove(photo.id) }
+        }
+        .contextMenu {
+            actions(for: photo, isCover: isCover)
         } preview: {
             PhotoThumbnail(photo: photo)
                 .aspectRatio(photo.aspect, contentMode: .fit)
                 .frame(width: 280)
         }
-        .accessibilityLabel(isCover ? "Cover photo" : "Photo")
+        .accessibilityLabel(isCover ? Text("Cover photo") : Text("Photo"))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityActions {
+            actions(for: photo, isCover: isCover)
+        }
+    }
+
+    @ViewBuilder
+    private func actions(for photo: WidgetPhoto, isCover: Bool) -> some View {
+        if !isCover {
+            Button("Make Cover", systemImage: "star") { onMakeCover(photo.id) }
+        }
+        Button("Reset Framing", systemImage: "arrow.counterclockwise") { onResetFraming(photo.id) }
+        Divider()
+        Button("Remove Photo", systemImage: "trash", role: .destructive) { onRemove(photo.id) }
     }
 
     private var addTile: some View {
@@ -87,10 +130,31 @@ struct Filmstrip: View {
             Image(systemName: "plus")
                 .font(.system(size: 17, weight: .semibold))
                 .frame(width: 42, height: 52)
-                .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 10))
+                .glass(.interactive, in: .rect(cornerRadius: 10))
         }
         .buttonStyle(.pressable(scale: 0.88))
         .accessibilityLabel("Add photos")
+    }
+}
+
+/// Reorders live: as a dragged photo passes over another, they swap places.
+private struct ReorderDropDelegate: DropDelegate {
+    let target: UUID
+    @Binding var dragging: UUID?
+    let onMove: (UUID, UUID) -> Void
+
+    func dropEntered(info: DropInfo) {
+        guard let dragging, dragging != target else { return }
+        onMove(dragging, target)
+    }
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        dragging = nil
+        return true
     }
 }
 

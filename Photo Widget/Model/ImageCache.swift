@@ -41,6 +41,15 @@ final class ImageCache {
         }
     }
 
+    /// A thumbnail with the widget's look, for the smaller cells of a collage preview.
+    func filteredThumbnail(_ photoID: UUID, filter: PhotoFilter, intensity: Double) async -> UIImage? {
+        let level = (intensity * 20).rounded() / 20
+        return await image(key: "fthumb/\(photoID)/\(filter.rawValue)/\(level)") {
+            guard let base = ImagePipeline.loadImage(at: WidgetStorage.thumbnailURL(photoID)) else { return nil }
+            return RenderEngine.filtered(base, filter: filter, intensity: level)
+        }
+    }
+
     /// Small previews for the filter picker.
     func swatch(_ photoID: UUID, filter: PhotoFilter) async -> UIImage? {
         await image(key: "swatch/\(photoID)/\(filter.rawValue)") {

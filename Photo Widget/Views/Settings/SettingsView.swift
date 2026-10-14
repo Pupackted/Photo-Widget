@@ -1,17 +1,22 @@
+import StoreKit
 import SwiftUI
 import WidgetKit
 
 struct SettingsView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.requestReview) private var requestReview
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @AppStorage("hasOnboarded") private var hasOnboarded = true
     @State private var showsGuide = false
     @State private var shuffles = 0
 
-    private var version: String {
-        let info = Bundle.main.infoDictionary
-        return "\(info?["CFBundleShortVersionString"] as? String ?? "1.0") (\(info?["CFBundleVersion"] as? String ?? "1"))"
+    private var summary: String {
+        let widgets = model.widgets.count == 1 ? String(localized: "1 widget") : String(localized: "\(model.widgets.count) widgets")
+        let count = model.widgets.reduce(0) { $0 + $1.photos.count }
+        let photos = count == 1 ? String(localized: "1 photo") : String(localized: "\(count) photos")
+        return "\(widgets) · \(photos)"
     }
 
     var body: some View {
@@ -30,7 +35,7 @@ struct SettingsView: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Photo Widget")
                                 .font(.title3.weight(.semibold))
-                            Text("\(model.widgets.count) widget\(model.widgets.count == 1 ? "" : "s") · \(model.widgets.reduce(0) { $0 + $1.photos.count }) photos")
+                            Text(summary)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -56,7 +61,11 @@ struct SettingsView: View {
                 } header: {
                     Text("Home Screen")
                 } footer: {
-                    Text("You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Photo Widget”.")
+                    if #available(iOS 18.0, *) {
+                        Text("You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Photo Widget”.")
+                    } else {
+                        Text("You can also ask Siri to “Shuffle Photo Widget”.")
+                    }
                 }
 
                 Section("Feel") {
@@ -71,8 +80,34 @@ struct SettingsView: View {
                     }
                 }
 
+                Section("Support") {
+                    Button {
+                        if let url = AppInfo.reviewURL { openURL(url) } else { requestReview() }
+                    } label: {
+                        Label("Rate Photo Widget", systemImage: "star")
+                    }
+                    if let url = AppInfo.supportURL {
+                        Button {
+                            openURL(url)
+                        } label: {
+                            Label("Contact Support", systemImage: "envelope")
+                        }
+                    }
+                    if let url = AppInfo.privacyPolicyURL {
+                        Link(destination: url) {
+                            Label("Privacy Policy", systemImage: "hand.raised")
+                        }
+                    } else {
+                        NavigationLink {
+                            PrivacyPolicyView()
+                        } label: {
+                            Label("Privacy Policy", systemImage: "hand.raised")
+                        }
+                    }
+                }
+
                 Section {
-                    LabeledContent("Version", value: version)
+                    LabeledContent("Version", value: AppInfo.version)
                 } header: {
                     Text("About")
                 } footer: {
@@ -84,7 +119,7 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done", systemImage: "checkmark") { dismiss() }
+                    DoneButton { dismiss() }
                 }
             }
             .sheet(isPresented: $showsGuide) { AddWidgetGuide() }

@@ -37,7 +37,7 @@ struct GlassSegmented<Value: Hashable, Label: View>: View {
             }
         }
         .padding(4)
-        .glassEffect(.regular, in: .capsule)
+        .glass(.regular, in: .capsule)
         .haptic(.selection, trigger: selection)
     }
 
@@ -60,6 +60,7 @@ struct ChipPicker<Value: Hashable>: View {
     let options: [Value]
     @Binding var selection: Value
     let title: (Value) -> String
+    var symbol: ((Value) -> String)?
     var isEnabled: (Value) -> Bool = { _ in true }
 
     var body: some View {
@@ -70,7 +71,13 @@ struct ChipPicker<Value: Hashable>: View {
                     Button {
                         withAnimation(.snappySpring) { selection = option }
                     } label: {
-                        Text(title(option))
+                        HStack(spacing: 6) {
+                            if let symbol {
+                                Image(systemName: symbol(option))
+                                    .font(.footnote.weight(.semibold))
+                            }
+                            Text(title(option))
+                        }
                             .font(.subheadline.weight(selected ? .semibold : .medium))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 9)
@@ -78,7 +85,7 @@ struct ChipPicker<Value: Hashable>: View {
                             .background {
                                 Capsule().fill(selected ? AnyShapeStyle(.tint) : AnyShapeStyle(.clear))
                             }
-                            .glassEffect(selected ? .identity : .regular.interactive(), in: .capsule)
+                            .glass(selected ? .none : .interactive, in: .capsule)
                     }
                     .buttonStyle(.pressable(scale: 0.92))
                     .disabled(!isEnabled(option))
@@ -122,7 +129,7 @@ struct SyncPill: View {
         .font(.footnote.weight(.semibold))
         .padding(.horizontal, 13)
         .padding(.vertical, 8)
-        .glassEffect(.regular, in: .capsule)
+        .glass(.regular, in: .capsule)
         .opacity(progress != nil || showsDone ? 1 : 0)
         .scaleEffect(progress != nil || showsDone ? 1 : 0.85)
         .animation(.snappySpring, value: progress)

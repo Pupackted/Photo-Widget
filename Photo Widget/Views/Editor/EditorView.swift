@@ -14,6 +14,7 @@ struct EditorView: View {
     @State private var proxy: (photoID: UUID, image: UIImage)?
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var showsPicker = false
+    @State private var showsFull = false
     @State private var showsGuide = false
     @State private var confirmsDelete = false
 
@@ -34,7 +35,7 @@ struct EditorView: View {
                 HStack(spacing: 0) {
                     VStack(spacing: 16) {
                         stage(widget, photo: photo)
-                        SizeSwitcher(selection: $size)
+                        sizeRow
                         filmstrip(widget)
                     }
                     .padding(.bottom, 20)
@@ -50,7 +51,7 @@ struct EditorView: View {
             } else {
                 VStack(spacing: 12) {
                     stage(widget, photo: photo)
-                    SizeSwitcher(selection: $size)
+                    sizeRow
                     filmstrip(widget)
                     toolPanel(binding, photo: photo)
                         .frame(height: 176)
@@ -74,7 +75,7 @@ struct EditorView: View {
                 proxy = (photo.id, image)
             }
         }
-        .photosPicker(isPresented: $showsPicker, selection: $pickerItems, maxSelectionCount: 50,
+        .photosPicker(isPresented: $showsPicker, selection: $pickerItems, maxSelectionCount: max(model.capacity(of: widgetID), 1),
                       selectionBehavior: .ordered, matching: .images, preferredItemEncoding: .current)
         .onChange(of: pickerItems) { _, items in
             guard !items.isEmpty else { return }
@@ -87,10 +88,17 @@ struct EditorView: View {
             }
         }
         .sheet(isPresented: $showsGuide) { AddWidgetGuide() }
+        .alert("This widget is full", isPresented: $showsFull) {
+            Button("OK") {}
+        } message: {
+            Text("A widget can hold up to \(PhotoWidgetConfig.maxPhotos) photos. Remove a few, or make another widget.")
+        }
         .confirmationDialog("Delete “\(widget.name)”?", isPresented: $confirmsDelete, titleVisibility: .visible) {
             Button("Delete Widget", role: .destructive) { delete() }
         } message: {
-            Text("It will be removed from your Home Screen too.")
+            model.widgets.count > 1
+                ? Text("Home Screen widgets showing it will switch to one of your other widgets.")
+                : Text("Home Screen widgets showing it will be empty until you make a new one.")
         }
     }
 
@@ -100,6 +108,7 @@ struct EditorView: View {
         EditorStage(
             widget: widget,
             photo: photo,
+            others: neighbours(of: photo, in: widget),
             size: size,
             image: photo.flatMap { photo in
                 proxy?.photoID == photo.id ? proxy?.image : ImageCache.shared.cached("thumb/\(photo.id)")
@@ -109,7 +118,10 @@ struct EditorView: View {
                 guard let photo else { return }
                 model.setCrop(crop, photo: photo.id, size: size, in: widgetID)
             },
-            onAddPhotos: { showsPicker = true }
+            onSelect: { id in
+                withAnimation(.snappySpring) { selectedPhotoID = id }
+            },
+            onAddPhotos: addPhotos
         )
         .overlay(alignment: .top) {
             SyncPill(progress: model.syncing[widgetID])
@@ -117,12 +129,37 @@ struct EditorView: View {
         }
     }
 
+    /// The size picker, briefly swapped for an Undo button after a photo is removed.
+    private var sizeRow: some View {
+        let showsUndo = model.recentlyRemoved?.widgetID == widgetID
+        return ZStack {
+            SizeSwitcher(selection: $size)
+                .opacity(showsUndo ? 0 : 1)
+                .allowsHitTesting(!showsUndo)
+            if showsUndo {
+                UndoToast { withAnimation(.snappySpring) { model.undoRemove() } }
+                    .transition(.scale(scale: 0.9).combined(with: .opacity))
+            }
+        }
+        .animation(.snappySpring, value: showsUndo)
+    }
+
+    /// The photos that share the widget with `photo` in a collage, in the order they'd appear.
+    private func neighbours(of photo: WidgetPhoto?, in widget: PhotoWidgetConfig) -> [WidgetPhoto] {
+        let cells = widget.effectiveLayout.cellCount
+        guard cells > 1, let photo, let start = widget.photos.firstIndex(of: photo) else { return [] }
+        return (1..<cells).map { widget.photos[(start + $0) % widget.photos.count] }
+    }
+
     private func filmstrip(_ widget: PhotoWidgetConfig) -> some View {
         Filmstrip(
             photos: widget.photos,
             selection: $selectedPhotoID,
             importingCount: model.importing[widgetID] ?? 0,
-            onAdd: { showsPicker = true },
+            onAdd: addPhotos,
+            onMove: { id, target in
+                withAnimation(.snappySpring) { model.movePhoto(id, to: target, in: widgetID) }
+            },
             onMakeCover: { id in
                 withAnimation(.snappySpring) { model.makeCover(id, in: widgetID) }
             },
@@ -148,7 +185,8 @@ struct EditorView: View {
                 CropPanel(
                     photo: photo,
                     size: size,
-                    slotAspect: WidgetLayout.canonical(size, frame: widget.wrappedValue.style.frame).photoAspect,
+                    slotAspect: WidgetLayout.canonical(size, frame: widget.wrappedValue.style.frame,
+                                                       collage: widget.wrappedValue.effectiveLayout).photoAspect,
                     setCrop: { crop in
                         guard let photo else { return }
                         model.setCrop(crop, photo: photo.id, size: size, in: widgetID)
@@ -165,9 +203,9 @@ struct EditorView: View {
             case .filter:
                 FilterPanel(photo: photo, style: widget.style)
             case .frame:
-                FramePanel(photo: photo, style: widget.style)
+                FramePanel(photo: photo, photoCount: widget.wrappedValue.photos.count, style: widget.style)
             case .caption:
-                CaptionPanel(photo: photo, style: widget.style)
+                CaptionPanel(photo: photo, style: widget.style, photoCaption: photoCaption(photo))
             case .timing:
                 TimingPanel(widget: widget)
             }
@@ -184,7 +222,7 @@ struct EditorView: View {
     private func toolbar(_ widget: PhotoWidgetConfig) -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
-                Button("Add Photos", systemImage: "photo.badge.plus") { showsPicker = true }
+                Button("Add Photos", systemImage: "photo.badge.plus", action: addPhotos)
                 Button("Duplicate", systemImage: "plus.square.on.square") {
                     withAnimation(.snappySpring) { _ = model.duplicate(widgetID) }
                 }
@@ -199,11 +237,27 @@ struct EditorView: View {
 
     // MARK: - Helpers
 
+    private func addPhotos() {
+        if model.capacity(of: widgetID) > 0 {
+            showsPicker = true
+        } else {
+            showsFull = true
+        }
+    }
+
     /// Edits go straight to the model, which saves and re-renders in the background.
     private func widgetBinding(_ widget: PhotoWidgetConfig) -> Binding<PhotoWidgetConfig> {
         Binding(
             get: { model.widget(widgetID) ?? widget },
             set: { updated in model.update(widgetID) { $0 = updated } }
+        )
+    }
+
+    private func photoCaption(_ photo: WidgetPhoto?) -> Binding<String>? {
+        guard let photo else { return nil }
+        return Binding(
+            get: { model.widget(widgetID)?.photo(id: photo.id)?.caption ?? "" },
+            set: { model.setCaption($0, photo: photo.id, in: widgetID) }
         )
     }
 
@@ -214,6 +268,24 @@ struct EditorView: View {
             try? await Task.sleep(for: .milliseconds(450))
             withAnimation(.snappySpring) { model.delete(id) }
         }
+    }
+}
+
+/// "Photo removed · Undo", shown for a few seconds after removing a photo.
+private struct UndoToast: View {
+    let onUndo: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Label("Photo removed", systemImage: "trash")
+                .font(.footnote.weight(.semibold))
+            Button("Undo", action: onUndo)
+                .font(.footnote.weight(.bold))
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, 16)
+        .padding(.vertical, 9)
+        .glass(.regular, in: .capsule)
     }
 }
 
