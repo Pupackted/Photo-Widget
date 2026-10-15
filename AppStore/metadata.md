@@ -4,10 +4,10 @@ Character limits are App Store Connect's. Everything here is a draft to edit.
 
 ## Before you submit
 
-- [ ] **Pick a unique name.** "Photo Widget" is almost certainly taken. The name shown under the icon stays "Photo Widget" (the bundle display name), so only the store name needs to be unique.
+- [ ] **Reserve the name** "Framed: Photo Widgets" when you create the app record (App Store Connect checks it's unique). The name under the icon is "Framed".
 - [ ] **Host the privacy policy** (`privacy-policy.md`, e.g. on GitHub Pages or Notion) and paste the URL into App Store Connect → App Privacy → Privacy Policy URL. Optionally set `AppInfo.privacyPolicyURL` so Settings links to it.
 - [ ] **Support URL** is required. A simple page or the same site as the policy works. Set `AppInfo.supportEmail` to show "Contact Support" in Settings.
-- [ ] After the app record exists, set `AppInfo.appStoreID` so "Rate Photo Widget" opens the review page directly.
+- [ ] After the app record exists, set `AppInfo.appStoreID` so "Rate Framed" opens the review page directly.
 - [ ] Screenshots: iPhone 6.9" (1320 × 2868) and, because iPad is supported, iPad 13" (2064 × 2752).
 - [ ] Add Indonesian as a localization in App Store Connect and paste the Indonesian copy below.
 
@@ -16,7 +16,7 @@ Character limits are App Store Connect's. Everything here is a draft to edit.
 | Field | Limit | Suggestion |
 |---|---|---|
 | Name | 30 | Framed: Photo Widgets |
-| Name (alt.) | 30 | Keepsake – Photo Widget |
+| Name (id) | 30 | Framed: Widget Foto |
 | Subtitle | 30 | Photos on your Home Screen |
 | Subtitle (id) | 30 | Foto favorit di Layar Utama |
 
@@ -32,7 +32,7 @@ Character limits are App Store Connect's. Everything here is a draft to edit.
 
 Turn your favorite photos into beautiful Home Screen widgets.
 
-Pick a few photos, and Photo Widget frames them for every widget size — faces and subjects stay in view automatically. Then make it yours:
+Pick a few photos, and Framed fits them to every widget size — faces and subjects stay in view automatically. Then make it yours:
 
 • Rotating photos — up to 50 per widget, changing every 15 minutes, hourly or daily, in order or shuffled
 • Album sync — keep a widget in step with any album, including Favorites
@@ -46,13 +46,13 @@ Pick a few photos, and Photo Widget frames them for every widget size — faces 
 • Shuffle from Control Center or with Siri
 • Works on iPhone and iPad, in StandBy, and on tinted Home Screens
 
-Private by design. Photo Widget uses the system photo picker, so it only sees the photos you choose — library access is asked for only if you sync an album or turn on On This Day. There are no accounts, no ads and no tracking, and your photos never leave your device.
+Private by design. Framed uses the system photo picker, so it only sees the photos you choose — library access is asked for only if you sync an album or turn on On This Day. There are no accounts, no ads and no tracking, and your photos never leave your device.
 
 **id**
 
 Ubah foto favorit Anda menjadi widget Layar Utama yang indah.
 
-Pilih beberapa foto, dan Photo Widget membingkainya untuk setiap ukuran widget — wajah dan objek utama otomatis tetap terlihat. Lalu sesuaikan:
+Pilih beberapa foto, dan Framed membingkainya untuk setiap ukuran widget — wajah dan objek utama otomatis tetap terlihat. Lalu sesuaikan:
 
 • Foto yang berganti — hingga 50 foto per widget, berganti tiap 15 menit, tiap jam, atau harian, berurutan atau acak
 • Sinkron album — widget selalu mengikuti album pilihan Anda, termasuk Favorit
@@ -66,13 +66,15 @@ Pilih beberapa foto, dan Photo Widget membingkainya untuk setiap ukuran widget �
 • Acak dari Pusat Kontrol atau dengan Siri
 • Berfungsi di iPhone dan iPad, di StandBy, dan di Layar Utama yang diwarnai
 
-Privat sejak awal. Photo Widget menggunakan pemilih foto bawaan sistem, jadi hanya melihat foto yang Anda pilih — akses perpustakaan hanya diminta jika Anda menyinkronkan album atau menyalakan Hari Ini Dulu. Tanpa akun, tanpa iklan, tanpa pelacakan, dan foto Anda tidak pernah keluar dari perangkat.
+Privat sejak awal. Framed menggunakan pemilih foto bawaan sistem, jadi hanya melihat foto yang Anda pilih — akses perpustakaan hanya diminta jika Anda menyinkronkan album atau menyalakan Hari Ini Dulu. Tanpa akun, tanpa iklan, tanpa pelacakan, dan foto Anda tidak pernah keluar dari perangkat.
 
 ## Keywords (100, comma-separated, no spaces after commas)
 
-**en:** `photo,widget,home screen,collage,frame,polaroid,countdown,days,shuffle,album,picture,memories`
+Words already in the name ("Framed", "Photo", "Widgets") are searchable, so they're left out here.
 
-**id:** `foto,widget,layar utama,kolase,bingkai,polaroid,hitung mundur,hari,kenangan,album,gambar,acak`
+**en:** `home screen,collage,polaroid,countdown,days since,on this day,memories,album,shuffle,picture,gallery`
+
+**id:** `layar utama,kolase,bingkai,polaroid,hitung mundur,kenangan,hari ini,album,gambar,acak,galeri`
 
 ## Categories
 
@@ -93,9 +95,9 @@ Answer "None" / "No" to every question → **4+**.
 
 ## Notes for App Review
 
-> No account or login is needed. Photo Widget uses the system photo picker (PHPicker) by default, which needs no permission. Photo library access is requested only when the user chooses "Sync an Album" or "On This Day" (New Widget menu, or Timing → Photos from in the editor); it's used on-device to pick photos for those widgets. A daily background app refresh keeps On This Day current.
+> No account or login is needed. Framed uses the system photo picker (PHPicker) by default, which needs no permission. Photo library access is requested only when the user chooses "Sync an Album" or "On This Day" (New Widget menu, or Timing → Photos from in the editor); it's used on-device to pick photos for those widgets. A daily background app refresh keeps On This Day current.
 >
-> To review: open the app, tap Get Started, choose a few photos, and adjust the widget in the editor. Then long-press the Home Screen → Edit → Add Widget → search "Photo Widget" and add any size. Long-press the placed widget → Edit Widget to pick which of your widgets it shows. Control Center's "Shuffle Photos" control (iOS 18+) and the Siri phrase "Shuffle Photo Widget" advance every widget to its next photo.
+> To review: open the app, tap Get Started, choose a few photos, and adjust the widget in the editor. Then long-press the Home Screen → Edit → Add Widget → search "Framed" and add any size. Long-press the placed widget → Edit Widget to pick which of your widgets it shows. Control Center's "Shuffle Photos" control (iOS 18+) and the Siri phrase "Shuffle Framed" advance every widget to its next photo.
 
 ## What's New (1.0)
 

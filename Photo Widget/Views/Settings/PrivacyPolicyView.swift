@@ -6,9 +6,9 @@ struct PrivacyPolicyView: View {
         ("Your photos stay on your device",
          "Photos you choose are copied into the app’s private storage on your device so your widgets can show them. They are never uploaded, shared or sent anywhere."),
         ("Only the photos you choose",
-         "Photo Widget normally uses the system photo picker, so it only sees the photos you select."),
+         "Framed normally uses the system photo picker, so it only sees the photos you select."),
         ("Albums and On This Day",
-         "If you sync a widget with an album or turn on On This Day, Photo Widget asks for access to your photo library. It reads the library only on your device, only to choose photos for those widgets. You can change this at any time in Settings → Privacy & Security → Photos."),
+         "If you sync a widget with an album or turn on On This Day, Framed asks for access to your photo library. It reads the library only on your device, only to choose photos for those widgets. You can change this at any time in Settings → Privacy & Security → Photos."),
         ("No accounts, no tracking",
          "There’s no sign-in, no analytics, no advertising and no third-party code. The app makes no network connections."),
         ("Backups",
@@ -16,7 +16,7 @@ struct PrivacyPolicyView: View {
         ("Deleting your data",
          "Deleting a widget deletes its photos from the app. Deleting the app removes everything it stored."),
         ("Questions",
-         "If you have questions about this policy, contact us through the App Store page for Photo Widget."),
+         "If you have questions about this policy, contact us through the App Store page for Framed."),
     ]
 
     var body: some View {

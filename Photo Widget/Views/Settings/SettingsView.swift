@@ -33,7 +33,7 @@ struct SettingsView: View {
                         .shadow(color: .black.opacity(0.15), radius: 6, y: 3)
 
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Photo Widget")
+                            Text(verbatim: "Framed")
                                 .font(.title3.weight(.semibold))
                             Text(summary)
                                 .font(.subheadline)
@@ -62,9 +62,9 @@ struct SettingsView: View {
                     Text("Home Screen")
                 } footer: {
                     if #available(iOS 18.0, *) {
-                        Text("You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Photo Widget”.")
+                        Text("You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Framed”.")
                     } else {
-                        Text("You can also ask Siri to “Shuffle Photo Widget”.")
+                        Text("You can also ask Siri to “Shuffle Framed”.")
                     }
                 }
 
@@ -84,7 +84,7 @@ struct SettingsView: View {
                     Button {
                         if let url = AppInfo.reviewURL { openURL(url) } else { requestReview() }
                     } label: {
-                        Label("Rate Photo Widget", systemImage: "star")
+                        Label("Rate Framed", systemImage: "star")
                     }
                     if let url = AppInfo.supportURL {
                         Button {

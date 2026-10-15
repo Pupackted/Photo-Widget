@@ -43,7 +43,7 @@ private struct PhotoSourceFlow: ViewModifier {
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("To sync albums and find On This Day memories, Photo Widget needs access to your photo library. Your photos never leave your device.")
+                Text("To sync albums and find On This Day memories, Framed needs access to your photo library. Your photos never leave your device.")
             }
     }
 }
@@ -74,7 +74,7 @@ struct AlbumPicker: View {
                             }
                         } footer: {
                             if PhotoLibrarySync.isLimited {
-                                Text("Photo Widget can only see the photos you’ve allowed. You can change this in Settings → Privacy & Security → Photos.")
+                                Text("Framed can only see the photos you’ve allowed. You can change this in Settings → Privacy & Security → Photos.")
                             } else {
                                 Text("The widget shows the album’s newest \(PhotoWidgetConfig.maxPhotos) photos and updates as you add more.")
                             }

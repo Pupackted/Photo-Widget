@@ -22,7 +22,7 @@ struct AddWidgetGuide: View {
         return [
             ("hand.tap", "Touch and hold an empty part of your Home Screen until the apps jiggle."),
             ("plus.circle", add),
-            ("magnifyingglass", "Search for Photo Widget and pick a size you like."),
+            ("magnifyingglass", "Search for Framed and pick a size you like."),
             ("slider.horizontal.3", "To choose which widget it shows, touch and hold it, then tap Edit Widget."),
         ]
     }

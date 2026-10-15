@@ -20,6 +20,6 @@ enum AppInfo {
     }
 
     static var supportURL: URL? {
-        supportEmail.flatMap { URL(string: "mailto:\($0)?subject=Photo%20Widget%20\(version.replacingOccurrences(of: " ", with: "%20"))") }
+        supportEmail.flatMap { URL(string: "mailto:\($0)?subject=Framed%20\(version.replacingOccurrences(of: " ", with: "%20"))") }
     }
 }

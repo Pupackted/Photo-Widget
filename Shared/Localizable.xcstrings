@@ -842,6 +842,26 @@
         }
       }
     },
+    "Framed can only see the photos you’ve allowed. You can change this in Settings → Privacy & Security → Photos.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Framed hanya bisa melihat foto yang Anda izinkan. Anda bisa mengubahnya di Pengaturan → Privasi & Keamanan → Foto."
+          }
+        }
+      }
+    },
+    "Framed normally uses the system photo picker, so it only sees the photos you select.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Framed biasanya menggunakan pemilih foto bawaan sistem, jadi hanya melihat foto yang Anda pilih."
+          }
+        }
+      }
+    },
     "Frames, filters & captions": {
       "localizations": {
         "id": {
@@ -982,22 +1002,22 @@
         }
       }
     },
-    "If you have questions about this policy, contact us through the App Store page for Photo Widget.": {
+    "If you have questions about this policy, contact us through the App Store page for Framed.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Jika ada pertanyaan tentang kebijakan ini, hubungi kami melalui halaman App Store Photo Widget."
+            "value": "Jika ada pertanyaan tentang kebijakan ini, hubungi kami melalui halaman App Store Framed."
           }
         }
       }
     },
-    "If you sync a widget with an album or turn on On This Day, Photo Widget asks for access to your photo library. It reads the library only on your device, only to choose photos for those widgets. You can change this at any time in Settings → Privacy & Security → Photos.": {
+    "If you sync a widget with an album or turn on On This Day, Framed asks for access to your photo library. It reads the library only on your device, only to choose photos for those widgets. You can change this at any time in Settings → Privacy & Security → Photos.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Jika Anda menyinkronkan widget dengan album atau menyalakan Hari Ini Dulu, Photo Widget meminta akses ke perpustakaan foto Anda. Perpustakaan hanya dibaca di perangkat Anda, hanya untuk memilih foto bagi widget tersebut. Anda bisa mengubahnya kapan saja di Pengaturan → Privasi & Keamanan → Foto."
+            "value": "Jika Anda menyinkronkan widget dengan album atau menyalakan Hari Ini Dulu, Framed meminta akses ke perpustakaan foto Anda. Perpustakaan hanya dibaca di perangkat Anda, hanya untuk memilih foto bagi widget tersebut. Anda bisa mengubahnya kapan saja di Pengaturan → Privasi & Keamanan → Foto."
           }
         }
       }
@@ -1397,27 +1417,7 @@
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Photo Widget"
-          }
-        }
-      }
-    },
-    "Photo Widget can only see the photos you’ve allowed. You can change this in Settings → Privacy & Security → Photos.": {
-      "localizations": {
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photo Widget hanya bisa melihat foto yang Anda izinkan. Anda bisa mengubahnya di Pengaturan → Privasi & Keamanan → Foto."
-          }
-        }
-      }
-    },
-    "Photo Widget normally uses the system photo picker, so it only sees the photos you select.": {
-      "localizations": {
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Photo Widget biasanya menggunakan pemilih foto bawaan sistem, jadi hanya melihat foto yang Anda pilih."
+            "value": "Widget Foto"
           }
         }
       }
@@ -1562,12 +1562,12 @@
         }
       }
     },
-    "Rate Photo Widget": {
+    "Rate Framed": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beri Nilai Photo Widget"
+            "value": "Beri Nilai Framed"
           }
         }
       }
@@ -1662,12 +1662,12 @@
         }
       }
     },
-    "Search for Photo Widget and pick a size you like.": {
+    "Search for Framed and pick a size you like.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cari Photo Widget lalu pilih ukuran yang Anda suka."
+            "value": "Cari Framed lalu pilih ukuran yang Anda suka."
           }
         }
       }
@@ -1962,12 +1962,12 @@
         }
       }
     },
-    "To sync albums and find On This Day memories, Photo Widget needs access to your photo library. Your photos never leave your device.": {
+    "To sync albums and find On This Day memories, Framed needs access to your photo library. Your photos never leave your device.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untuk menyinkronkan album dan menemukan kenangan Hari Ini Dulu, Photo Widget perlu akses ke perpustakaan foto Anda. Foto Anda tidak pernah keluar dari perangkat."
+            "value": "Untuk menyinkronkan album dan menemukan kenangan Hari Ini Dulu, Framed perlu akses ke perpustakaan foto Anda. Foto Anda tidak pernah keluar dari perangkat."
           }
         }
       }
@@ -2132,22 +2132,22 @@
         }
       }
     },
-    "You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Photo Widget”.": {
+    "You can also add “Shuffle Photos” to Control Center, or ask Siri to “Shuffle Framed”.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Anda juga bisa menambahkan “Acak Foto” ke Pusat Kontrol, atau meminta Siri untuk “Shuffle Photo Widget”."
+            "value": "Anda juga bisa menambahkan “Acak Foto” ke Pusat Kontrol, atau meminta Siri untuk “Shuffle Framed”."
           }
         }
       }
     },
-    "You can also ask Siri to “Shuffle Photo Widget”.": {
+    "You can also ask Siri to “Shuffle Framed”.": {
       "localizations": {
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Anda juga bisa meminta Siri untuk “Shuffle Photo Widget”."
+            "value": "Anda juga bisa meminta Siri untuk “Shuffle Framed”."
           }
         }
       }

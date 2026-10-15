@@ -54,7 +54,7 @@ struct LibraryView: View {
                 }
             }
             .background { LibraryBackdrop(colors: model.sortedWidgets.flatMap { $0.photos.prefix(3).map(\.averageColor) }) }
-            .navigationTitle("Photo Widget")
+            .navigationTitle(Text(verbatim: "Framed"))
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) {
                 if !model.widgets.isEmpty { newWidgetButton }
