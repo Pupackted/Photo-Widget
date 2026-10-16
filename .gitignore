@@ -4,3 +4,7 @@ DerivedData/
 build/
 *.xcuserstate
 .DS_Store
+
+# Original full-size App Store screenshots (JPEG copies in AppStore/screenshots/upload are kept)
+AppStore/screenshots/iphone/
+AppStore/screenshots/ipad/

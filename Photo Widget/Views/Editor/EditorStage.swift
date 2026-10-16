@@ -26,6 +26,7 @@ struct EditorStage: View {
     @State private var snappedY = false
     @State private var atLimit = false
     @State private var glow: UIImage?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private var interacting: Bool { raw != nil }
 
@@ -165,7 +166,9 @@ struct EditorStage: View {
     private func faceFrame(in available: CGSize) -> CGRect {
         let canonical = size.canonicalSize
         let room = CGSize(width: max(available.width - 40, 60), height: max(available.height - 64, 60))
-        let scale = min(room.width / canonical.width, room.height / canonical.height, 1.6)
+        // Bigger on iPad, where widgets themselves are bigger.
+        let maxScale: CGFloat = horizontalSizeClass == .regular ? 2.4 : 1.6
+        let scale = min(room.width / canonical.width, room.height / canonical.height, maxScale)
         let faceSize = CGSize(width: canonical.width * scale, height: canonical.height * scale)
         return CGRect(x: (available.width - faceSize.width) / 2, y: (available.height - faceSize.height) / 2 + 8,
                       width: faceSize.width, height: faceSize.height)

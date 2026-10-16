@@ -32,8 +32,10 @@ struct EditorView: View {
         let photo = widget.photo(id: selectedPhotoID) ?? widget.coverPhoto
         let binding = widgetBinding(widget)
 
-        return Group {
-            if horizontalSizeClass == .regular {
+        let regular = horizontalSizeClass == .regular
+        return GeometryReader { proxy in
+            // Side by side needs a landscape-shaped window; a portrait iPad stacks like a phone.
+            if regular, proxy.size.width > proxy.size.height {
                 HStack(spacing: 0) {
                     VStack(spacing: 16) {
                         stage(widget, photo: photo)
@@ -56,9 +58,10 @@ struct EditorView: View {
                     sizeRow
                     filmstrip(widget)
                     toolPanel(binding, photo: photo)
-                        .frame(height: 176)
+                        .frame(height: regular ? 220 : 176)
+                        .frame(maxWidth: regular ? 640 : .infinity)
                     ToolBar(selection: $tool)
-                        .padding(.bottom, 6)
+                        .padding(.bottom, regular ? 20 : 6)
                 }
             }
         }

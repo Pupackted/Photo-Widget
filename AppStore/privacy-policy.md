@@ -1,6 +1,8 @@
 # Framed: Photo Widgets — Privacy Policy
 
-_Last updated: October 2026_
+_Last updated: October 16, 2026_
+
+Published at https://pupackted.github.io/framed/privacy.html (source: `AppStore/site/`).
 
 Framed puts photos you choose on your Home Screen. It is built so that nothing you add ever leaves your device.
 
@@ -29,4 +31,4 @@ Framed does not collect any information from anyone, including children.
 If this policy changes, the updated version will be posted at this address with a new date.
 
 ## Contact
-Questions about this policy: <!-- add your support email or contact page here -->
+Questions about this policy: adrian.y.rachman@gmail.com

@@ -4,10 +4,11 @@ import Foundation
 enum AppInfo {
     /// The number in the app's App Store URL (App Store Connect → App Information → Apple ID).
     /// With it, "Rate" opens the review page; without it, the system rating prompt is used.
-    static let appStoreID: String? = nil
+    static let appStoreID: String? = "6823531385"
     /// Where "Contact Support" sends email.
-    static let supportEmail: String? = nil
+    static let supportEmail: String? = "adrian.y.rachman@gmail.com"
     /// A hosted copy of the privacy policy. The in-app policy is shown when this is empty.
+    /// (Hosted at https://pupackted.github.io/framed/privacy.html; the in-app copy reads offline, so it stays.)
     static let privacyPolicyURL: URL? = nil
 
     static var version: String {
