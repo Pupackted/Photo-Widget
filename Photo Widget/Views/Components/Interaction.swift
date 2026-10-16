@@ -68,3 +68,28 @@ extension View {
         modifier(EntranceModifier(visible: visible, index: index))
     }
 }
+
+// MARK: - Scroll rows
+
+extension View {
+    /// Fades a horizontal scroll row out at its sides instead of letting it run past them, for rows
+    /// that sit in a column (iPad) rather than running edge to edge. Overflow above and below, like
+    /// shadows and badges, is left alone.
+    @ViewBuilder
+    func edgeFade(_ enabled: Bool, width: CGFloat = 20) -> some View {
+        if enabled {
+            mask {
+                HStack(spacing: 0) {
+                    LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: width)
+                    Color.black
+                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: width)
+                }
+                .padding(.vertical, -40)
+            }
+        } else {
+            self
+        }
+    }
+}

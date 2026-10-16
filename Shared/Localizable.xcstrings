@@ -1312,6 +1312,16 @@
         }
       }
     },
+    "On iPad, try the Extra Large size.": {
+      "localizations": {
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di iPad, coba ukuran Ekstra Besar."
+          }
+        }
+      }
+    },
     "On This Day": {
       "localizations": {
         "id": {

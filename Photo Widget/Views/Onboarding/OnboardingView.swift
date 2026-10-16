@@ -3,6 +3,8 @@ import SwiftUI
 struct OnboardingView: View {
     let onFinish: () -> Void
     @State private var appeared = false
+    @State private var viewportHeight: CGFloat = 0
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private let features: [(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey)] = [
         ("photo.stack", "Photos that rotate", "Pick up to 50 photos, sync an album, or relive this day in past years — one at a time or as a collage."),
@@ -46,7 +48,11 @@ struct OnboardingView: View {
                 .frame(maxWidth: 520)
             }
             .padding(.bottom, 24)
+            .frame(maxWidth: .infinity)
+            // iPad has room to spare, so the welcome sits in the middle rather than at the top.
+            .frame(minHeight: horizontalSizeClass == .regular ? viewportHeight : 0)
         }
+        .onGeometryChange(for: CGFloat.self, of: \.size.height) { viewportHeight = $0 }
         .scrollBounceBehavior(.basedOnSize)
         .scrollIndicators(.hidden)
         .bottomBar {
@@ -69,6 +75,7 @@ struct OnboardingView: View {
             .frame(maxWidth: 520)
             .entrance(appeared, index: 8)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background { OnboardingBackdrop() }
         .onAppear { appeared = true }
     }

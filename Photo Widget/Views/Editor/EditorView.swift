@@ -41,25 +41,31 @@ struct EditorView: View {
                         stage(widget, photo: photo)
                         sizeRow
                         filmstrip(widget)
+                            .frame(maxWidth: 640)
                     }
                     .padding(.bottom, 20)
 
+                    // The tools sit beside the preview, centered on it, at a fixed height so
+                    // switching tools doesn't make them jump.
                     VStack(spacing: 22) {
                         ToolBar(selection: $tool)
                         toolPanel(binding, photo: photo)
-                            .frame(maxHeight: .infinity, alignment: .top)
+                            .frame(height: 320)
                     }
                     .frame(width: 420)
-                    .padding(.top, 16)
+                    .frame(maxHeight: .infinity)
+                    .padding(.trailing, 16)
                 }
             } else {
                 VStack(spacing: 12) {
                     stage(widget, photo: photo)
                     sizeRow
-                    filmstrip(widget)
-                    toolPanel(binding, photo: photo)
-                        .frame(height: regular ? 220 : 176)
-                        .frame(maxWidth: regular ? 640 : .infinity)
+                    Group {
+                        filmstrip(widget)
+                        toolPanel(binding, photo: photo)
+                            .frame(height: regular ? 240 : 176)
+                    }
+                    .frame(maxWidth: regular ? 640 : .infinity)
                     ToolBar(selection: $tool)
                         .padding(.bottom, regular ? 20 : 6)
                 }

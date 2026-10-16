@@ -17,6 +17,8 @@ struct Filmstrip: View {
     let onRemove: (UUID) -> Void
 
     @State private var dragging: UUID?
+    @State private var width: CGFloat = 0
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private var selectedID: UUID? { selection ?? photos.first?.id }
 
@@ -38,9 +40,13 @@ struct Filmstrip: View {
                 }
                 .padding(.horizontal, 20)
                 .frame(height: 68)
+                // On iPad a few photos sit centered under the preview instead of off in a corner.
+                .frame(minWidth: horizontalSizeClass == .regular ? width : 0)
             }
             .scrollIndicators(.hidden)
             .scrollClipDisabled()
+            .edgeFade(horizontalSizeClass == .regular)
+            .onGeometryChange(for: CGFloat.self, of: \.size.width) { width = $0 }
             .onChange(of: selection) { _, id in
                 guard let id else { return }
                 withAnimation(.snappySpring) { reader.scrollTo(id, anchor: .center) }

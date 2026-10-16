@@ -259,6 +259,7 @@ struct CropPanel: View {
 struct FilterPanel: View {
     let photo: WidgetPhoto?
     @Binding var style: WidgetStyle
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         VStack(spacing: 14) {
@@ -280,6 +281,7 @@ struct FilterPanel: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollClipDisabled()
+                .edgeFade(horizontalSizeClass == .regular)
                 .onAppear { reader.scrollTo(style.filter, anchor: .center) }
             }
 

@@ -62,6 +62,7 @@ struct ChipPicker<Value: Hashable>: View {
     let title: (Value) -> String
     var symbol: ((Value) -> String)?
     var isEnabled: (Value) -> Bool = { _ in true }
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -97,6 +98,7 @@ struct ChipPicker<Value: Hashable>: View {
         }
         .scrollIndicators(.hidden)
         .scrollClipDisabled()
+        .edgeFade(horizontalSizeClass == .regular)
         .haptic(.selection, trigger: selection)
     }
 }

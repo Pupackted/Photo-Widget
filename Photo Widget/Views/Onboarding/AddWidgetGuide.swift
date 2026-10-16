@@ -3,6 +3,7 @@ import SwiftUI
 /// Walks through adding a widget, with a looping animation of it happening.
 struct AddWidgetGuide: View {
     @Environment(\.dismiss) private var dismiss
+    private let isPad = UIDevice.current.userInterfaceIdiom == .pad
 
     /// One line for tips. The Home Screen's Edit menu arrived in iOS 18; before that it's a + button.
     static var shortInstructions: LocalizedStringKey {
@@ -31,7 +32,7 @@ struct AddWidgetGuide: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 28) {
-                    HomeScreenDemo()
+                    HomeScreenDemo(isPad: isPad)
                         .frame(height: 300)
                         .padding(.top, 8)
 
@@ -52,7 +53,8 @@ struct AddWidgetGuide: View {
                     }
                     .padding(.horizontal, 28)
 
-                    Label("Widgets also work in StandBy and on iPad.", systemImage: "lightbulb")
+                    Label(isPad ? "On iPad, try the Extra Large size." : "Widgets also work in StandBy and on iPad.",
+                          systemImage: "lightbulb")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 28)
@@ -75,12 +77,14 @@ struct AddWidgetGuide: View {
 }
 
 /// A tiny Home Screen: a finger presses, apps jiggle, a photo widget drops into place. Loops.
+/// Drawn as the device it's running on: a phone, or a wider iPad.
 private struct HomeScreenDemo: View {
+    let isPad: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let cycle = 6.0
-    private let columns = 4
-    private let rows = 5
+    private var columns: Int { isPad ? 6 : 4 }
+    private var rows: Int { isPad ? 4 : 5 }
     private let iconColors: [Color] = [
         Color(red: 0.36, green: 0.78, blue: 0.47), Color(red: 1, green: 0.58, blue: 0.3), Color(red: 0.35, green: 0.6, blue: 1),
         Color(red: 1, green: 0.8, blue: 0.3), Color(red: 0.95, green: 0.38, blue: 0.45), Color(red: 0.62, green: 0.48, blue: 0.95),
@@ -99,7 +103,7 @@ private struct HomeScreenDemo: View {
             phone {
                 GeometryReader { proxy in
                     let inset: CGFloat = 16
-                    let icon = (proxy.size.width - inset * 2 - 3 * 12) / 4
+                    let icon = (proxy.size.width - inset * 2 - CGFloat(columns - 1) * 12) / CGFloat(columns)
                     let rowHeight = icon + 18
                     ForEach(0..<(columns * rows), id: \.self) { index in
                         let column = index % columns, row = index / columns
@@ -144,16 +148,16 @@ private struct HomeScreenDemo: View {
     }
 
     private func phone<Content: View>(@ViewBuilder content: () -> Content) -> some View {
-        ZStack {
+        let screen = UnevenRoundedRectangle(topLeadingRadius: isPad ? 30 : 46, topTrailingRadius: isPad ? 30 : 46, style: .continuous)
+        return ZStack {
             SceneArt(kind: .night)
                 .overlay(Color.black.opacity(0.1))
             content()
         }
-        .frame(width: 230)
-        .clipShape(UnevenRoundedRectangle(topLeadingRadius: 46, topTrailingRadius: 46, style: .continuous))
+        .frame(width: isPad ? 400 : 230)
+        .clipShape(screen)
         .overlay {
-            UnevenRoundedRectangle(topLeadingRadius: 46, topTrailingRadius: 46, style: .continuous)
-                .strokeBorder(Color.primary.opacity(0.85), lineWidth: 7)
+            screen.strokeBorder(Color.primary.opacity(0.85), lineWidth: isPad ? 9 : 7)
         }
         .mask(LinearGradient(colors: [.black, .black, .black.opacity(0)], startPoint: .top, endPoint: .bottom))
         .shadow(color: .black.opacity(0.15), radius: 20, y: 10)
